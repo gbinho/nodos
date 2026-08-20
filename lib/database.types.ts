@@ -33,6 +33,23 @@ export type CommentRow = {
   created_at: string;
 };
 
+export type BadgeRow = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  icon_name: string;
+  req_type: "checkins_count" | "total_hours" | "streak_days" | "total_xp";
+  req_value: number;
+};
+
+export type UserBadgeRow = {
+  id: string;
+  user_id: string;
+  badge_id: string;
+  unlocked_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -115,6 +132,35 @@ export type Database = {
           user_id?: string;
           content?: string;
           created_at?: string;
+        };
+        Relationships: [];
+      };
+      badges: {
+        Row: BadgeRow;
+        Insert: {
+          id?: string;
+          slug: string;
+          title: string;
+          description: string;
+          icon_name: string;
+          req_type: BadgeRow["req_type"];
+          req_value: number;
+        };
+        Update: Partial<Omit<BadgeRow, "id">>;
+        Relationships: [];
+      };
+      user_badges: {
+        Row: UserBadgeRow;
+        Insert: {
+          id?: string;
+          user_id: string;
+          badge_id: string;
+          unlocked_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          badge_id?: string;
+          unlocked_at?: string;
         };
         Relationships: [];
       };

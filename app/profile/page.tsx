@@ -1,9 +1,11 @@
 import { Activity, Clock3, Crown, Mail, Music2, User } from "lucide-react";
 import { CheckinCard } from "@/components/CheckinCard";
+import { BadgesGrid } from "@/components/BadgesGrid";
 import { EditProfileButton } from "@/components/EditProfileButton";
 import { HobbyHeatmap } from "@/components/HobbyHeatmap";
 import SetupEnvPage from "@/components/SetupEnvPage";
 import { getSessionUser } from "@/lib/auth";
+import { checkAndAwardBadges } from "@/lib/badges";
 import { displayName, formatMinutes, type CheckinWithProfile } from "@/lib/checkins";
 
 export const dynamic = "force-dynamic";
@@ -42,6 +44,8 @@ export default async function ProfilePage() {
 
   if (!configured) return <SetupEnvPage />;
   if (!user || !supabase) return null;
+
+  await checkAndAwardBadges(user.id);
 
   const { data, error } = await supabase
     .from("checkins")
@@ -166,6 +170,8 @@ export default async function ProfilePage() {
       </section>
 
       <HobbyHeatmap userId={user.id} />
+
+      <BadgesGrid userId={user.id} />
 
       <section>
         <div className="mb-5 flex items-end justify-between gap-4">
