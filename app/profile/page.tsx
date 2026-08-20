@@ -1,11 +1,41 @@
 import { Activity, Clock3, Crown, Mail, Music2, User } from "lucide-react";
 import { CheckinCard } from "@/components/CheckinCard";
+import { EditProfileButton } from "@/components/EditProfileButton";
 import { HobbyHeatmap } from "@/components/HobbyHeatmap";
 import SetupEnvPage from "@/components/SetupEnvPage";
 import { getSessionUser } from "@/lib/auth";
 import { displayName, formatMinutes, type CheckinWithProfile } from "@/lib/checkins";
 
 export const dynamic = "force-dynamic";
+
+function getSpotifyEmbedUrl(value: string | null | undefined) {
+  if (!value) return null;
+
+  try {
+    const url = new URL(value);
+    if (url.hostname !== "open.spotify.com") return null;
+
+    const [type, id] = url.pathname.split("/").filter(Boolean);
+    const supportedTypes = new Set(["track", "playlist", "album", "episode", "show"]);
+    if (!id || !supportedTypes.has(type)) return null;
+
+    return `https://open.spotify.com/embed/${type}/${encodeURIComponent(id)}`;
+  } catch {
+    return null;
+  }
+}
+
+function getSafeBackgroundUrl(value: string | null | undefined) {
+  if (!value) return null;
+
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+    return url.toString().replace(/"/g, "%22");
+  } catch {
+    return null;
+  }
+}
 
 export default async function ProfilePage() {
   const { supabase, user, profile, configured } = await getSessionUser();
@@ -29,6 +59,8 @@ export default async function ProfilePage() {
     0,
   );
   const totalHours = totalMinutes / 60;
+  const spotifyEmbedUrl = getSpotifyEmbedUrl(profile?.spotify_url);
+  const backgroundUrl = getSafeBackgroundUrl(profile?.bg_gif_url);
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-10">
@@ -37,27 +69,40 @@ export default async function ProfilePage() {
           <p className="text-xs tracking-[0.22em] text-gray-500">PERFIL</p>
           <h1 className="mt-3 text-3xl font-medium tracking-tight">Seu percurso</h1>
         </div>
-        <p className="hidden text-right text-sm text-gray-500 sm:block">Progresso pessoal</p>
+        <div className="flex items-center gap-4">
+          <p className="hidden text-right text-sm text-gray-500 sm:block">Progresso pessoal</p>
+          {profile ? <EditProfileButton profile={profile} /> : null}
+        </div>
       </header>
 
       <section aria-label="Resumo do perfil" className="grid grid-cols-1 gap-4 md:grid-cols-6">
-        <article className="border border-gray-800 bg-gray-950 p-6 md:col-span-3">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-gray-700 bg-gray-900">
-              {profile?.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={profile.avatar_url} alt="" className="h-full w-full rounded-full object-cover" />
-              ) : (
-                <User className="h-7 w-7 text-gray-400" strokeWidth={1.25} />
-              )}
+        <article
+          className="relative overflow-hidden border border-gray-800 bg-gray-950 p-6 md:col-span-3"
+          style={
+            backgroundUrl
+              ? { backgroundImage: `url("${backgroundUrl}")`, backgroundSize: "cover", backgroundPosition: "center" }
+              : undefined
+          }
+        >
+          {backgroundUrl ? <div className="absolute inset-0 bg-black/70" aria-hidden="true" /> : null}
+          <div className="relative">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-gray-700 bg-gray-900">
+                {profile?.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={profile.avatar_url} alt="" className="h-full w-full rounded-full object-cover" />
+                ) : (
+                  <User className="h-7 w-7 text-gray-400" strokeWidth={1.25} />
+                )}
+              </div>
+              <span className="text-xs text-gray-300">IDENTIDADE</span>
             </div>
-            <span className="text-xs text-gray-500">IDENTIDADE</span>
+            <h2 className="mt-8 text-2xl font-medium">{name}</h2>
+            <p className="mt-2 flex items-center gap-2 text-sm text-gray-300">
+              <Mail className="h-3.5 w-3.5" strokeWidth={1.5} />
+              {profile?.email ?? "E-mail não informado"}
+            </p>
           </div>
-          <h2 className="mt-8 text-2xl font-medium">{name}</h2>
-          <p className="mt-2 flex items-center gap-2 text-sm text-gray-400">
-            <Mail className="h-3.5 w-3.5" strokeWidth={1.5} />
-            {profile?.email ?? "E-mail não informado"}
-          </p>
         </article>
 
         <article className="border border-gray-800 bg-gray-900 p-6 md:col-span-3">
@@ -103,10 +148,20 @@ export default async function ProfilePage() {
             <span className="text-xs text-gray-500">MÚSICA TEMA</span>
             <Music2 className="h-5 w-5 text-gray-400" strokeWidth={1.5} />
           </div>
-          <div className="mt-auto flex items-center justify-between gap-4 border-t border-gray-800 pt-4">
-            <p className="text-sm text-gray-400">Nenhuma faixa conectada</p>
-            <span className="text-xs text-gray-600">SPOTIFY</span>
-          </div>
+          {spotifyEmbedUrl ? (
+            <iframe
+              title="Música tema do perfil"
+              src={spotifyEmbedUrl}
+              className="mt-4 h-20 w-full rounded"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+            />
+          ) : (
+            <div className="mt-auto flex items-center justify-between gap-4 border-t border-gray-800 pt-4">
+              <p className="text-sm text-gray-400">Nenhuma faixa conectada</p>
+              <span className="text-xs text-gray-600">SPOTIFY</span>
+            </div>
+          )}
         </article>
       </section>
 

@@ -3,6 +3,8 @@ export type ProfileRow = {
   email: string | null;
   username: string | null;
   avatar_url: string | null;
+  spotify_url: string | null;
+  bg_gif_url: string | null;
   total_xp: number;
 };
 
@@ -26,12 +28,16 @@ export type Database = {
           email?: string | null;
           username?: string | null;
           avatar_url?: string | null;
+          spotify_url?: string | null;
+          bg_gif_url?: string | null;
           total_xp?: number;
         };
         Update: {
           email?: string | null;
           username?: string | null;
           avatar_url?: string | null;
+          spotify_url?: string | null;
+          bg_gif_url?: string | null;
           total_xp?: number;
         };
         Relationships: [];
