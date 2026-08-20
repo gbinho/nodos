@@ -12,8 +12,8 @@ export async function HobbyHeatmap({ userId }: HobbyHeatmapProps) {
 
   const { data, error } = await supabase
     .from("checkins")
-    .select("created_at, time_invested_minutes")
+    .select("created_at, time_invested_minutes, hobby_tag")
     .eq("user_id", userId);
 
-  return <HobbyHeatmapClient checkins={(data ?? []) as Pick<CheckinRow, "created_at" | "time_invested_minutes">[]} error={error?.message ?? null} />;
+  return <HobbyHeatmapClient checkins={(data ?? []) as Pick<CheckinRow, "created_at" | "time_invested_minutes" | "hobby_tag">[]} error={error?.message ?? null} />;
 }

@@ -6,11 +6,12 @@ import type { CheckinWithProfile } from "@/lib/checkins";
 
 export const dynamic = "force-dynamic";
 
-export default async function NodesPage() {
+export default async function NodesPage({ searchParams }: { searchParams: Promise<{ tag?: string }> }) {
   const { supabase, user, configured } = await getSessionUser();
 
   if (!configured) return <SetupEnvPage />;
   if (!user || !supabase) return null;
+  const { tag } = await searchParams;
 
   const { data, error } = await supabase
     .from("checkins")
@@ -23,6 +24,7 @@ export default async function NodesPage() {
       initialCheckins={(data ?? []) as CheckinWithProfile[]}
       initialError={error?.message ?? null}
       tags={HOBBY_TAGS}
+      initialTag={tag ?? "Todos"}
     />
   );
 }

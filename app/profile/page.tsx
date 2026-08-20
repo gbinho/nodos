@@ -110,6 +110,33 @@ export default async function ProfilePage() {
         </div>
       </header>
 
+      <section aria-label="Identidade e música tema" className="grid grid-cols-1 gap-4 lg:grid-cols-[1.4fr_0.8fr]">
+        <article
+          className="relative min-h-64 overflow-hidden rounded-2xl border border-gray-800 bg-gray-950 p-7"
+          style={backgroundUrl ? { backgroundImage: `url("${backgroundUrl}")`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
+        >
+          {backgroundUrl ? <img src={backgroundUrl} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" /> : null}
+          {backgroundUrl ? <div className="absolute inset-0 bg-black/35" aria-hidden="true" /> : null}
+          <div className="relative flex h-full flex-col justify-end">
+            <div className="absolute right-0 top-0 text-xs text-gray-300">IDENTIDADE</div>
+            <div className="flex items-end gap-5">
+              <div className="flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-full border-4 border-zinc-900 ring-4 ring-white/20">
+                {profile?.avatar_url ? <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" /> : <User className="h-12 w-12 text-gray-400" strokeWidth={1.25} />}
+              </div>
+              <div className="pb-1">
+                <h2 className="text-3xl font-semibold text-white">{name}</h2>
+                <p className="mt-1 text-sm text-gray-300">@{profile?.username ?? name}</p>
+                {profile?.email_public && profile.email ? <p className="mt-2 flex items-center gap-2 text-sm text-gray-300"><Mail className="h-3.5 w-3.5" strokeWidth={1.5} />{profile.email}</p> : null}
+              </div>
+            </div>
+          </div>
+        </article>
+        <article className="flex min-h-64 flex-col rounded-2xl border border-[#e4e5e9] bg-white p-6">
+          <div className="flex items-center justify-between"><span className="text-xs tracking-[0.18em] text-[#71737c]">MÚSICA TEMA</span><Music2 className="h-5 w-5 text-[#111114]" strokeWidth={1.5} /></div>
+          {spotifyEmbedUrl ? <iframe title="Música tema do perfil" src={spotifyEmbedUrl} className="mt-auto h-24 w-full rounded" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" /> : <p className="mt-auto text-sm text-[#71737c]">Nenhuma faixa conectada</p>}
+        </article>
+      </section>
+
       <section aria-label="Tópicos ativos e sequência" className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
         <div className="flex-1 rounded-2xl border border-[#e4e5e9] bg-[#111114] p-5 text-white">
           <div className="flex items-center justify-between gap-4">
@@ -145,42 +172,7 @@ export default async function ProfilePage() {
       </section>
 
       <section aria-label="Resumo do perfil" className="grid grid-cols-1 gap-4 md:grid-cols-6">
-        <article
-          className="relative overflow-hidden border border-gray-800 bg-gray-950 p-6 md:col-span-3"
-          style={
-            backgroundUrl
-              ? { backgroundImage: `url("${backgroundUrl}")`, backgroundSize: "cover", backgroundPosition: "center" }
-              : undefined
-          }
-        >
-          {backgroundUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={backgroundUrl} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
-          ) : null}
-          {backgroundUrl ? <div className="absolute inset-0 bg-black/35" aria-hidden="true" /> : null}
-          <div className="relative">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-gray-700 bg-gray-900">
-                {profile?.avatar_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={profile.avatar_url} alt="" className="h-full w-full rounded-full object-cover" />
-                ) : (
-                  <User className="h-7 w-7 text-gray-400" strokeWidth={1.25} />
-                )}
-              </div>
-              <span className="text-xs text-gray-300">IDENTIDADE</span>
-            </div>
-            <h2 className="mt-8 text-2xl font-medium text-white">{name}</h2>
-            {profile?.email_public && profile.email ? (
-              <p className="mt-2 flex items-center gap-2 text-sm text-gray-300">
-                <Mail className="h-3.5 w-3.5" strokeWidth={1.5} />
-                {profile.email}
-              </p>
-            ) : null}
-          </div>
-        </article>
-
-        <article className="rounded-2xl border border-[#e4e5e9] bg-[#111114] p-6 text-white md:col-span-3">
+        <article className="rounded-2xl border border-[#e4e5e9] bg-[#111114] p-6 text-white md:col-span-2">
           <div className="flex items-start justify-between">
             <span className="text-xs text-gray-500">RANKING</span>
             <Crown className="h-5 w-5 text-gray-300" strokeWidth={1.5} />
@@ -218,31 +210,12 @@ export default async function ProfilePage() {
           <p className="mt-1 text-sm text-gray-500">check-ins registrados</p>
         </article>
 
-        <article className="flex min-h-40 flex-col rounded-2xl border border-[#e4e5e9] bg-white p-6 md:col-span-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-500">MÚSICA TEMA</span>
-            <Music2 className="h-5 w-5 text-gray-400" strokeWidth={1.5} />
-          </div>
-          {spotifyEmbedUrl ? (
-            <iframe
-              title="Música tema do perfil"
-              src={spotifyEmbedUrl}
-              className="mt-4 h-20 w-full rounded"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              loading="lazy"
-            />
-          ) : (
-            <div className="mt-auto flex items-center justify-between gap-4 border-t border-[#ececf0] pt-4">
-              <p className="text-sm text-[#71737c]">Nenhuma faixa conectada</p>
-              <span className="text-xs text-[#a0a1a8]">SPOTIFY</span>
-            </div>
-          )}
-        </article>
       </section>
 
-      <HobbyHeatmap userId={user.id} />
-
-      <BadgesGrid userId={user.id} />
+      <section aria-label="Conquistas e consistência" className="grid grid-cols-1 gap-4 lg:grid-cols-5">
+        <div className="lg:col-span-3"><BadgesGrid userId={user.id} /></div>
+        <div className="lg:col-span-2"><HobbyHeatmap userId={user.id} /></div>
+      </section>
 
       {featuredCheckins.length ? (
         <section>

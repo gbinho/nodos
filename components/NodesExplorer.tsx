@@ -11,10 +11,11 @@ type NodesExplorerProps = {
   initialCheckins: CheckinWithProfile[];
   initialError: string | null;
   tags: readonly string[];
+  initialTag: string;
 };
 
-export function NodesExplorer({ currentUserId, initialCheckins, initialError, tags }: NodesExplorerProps) {
-  const [selectedTag, setSelectedTag] = useState("Todos");
+export function NodesExplorer({ currentUserId, initialCheckins, initialError, tags, initialTag }: NodesExplorerProps) {
+  const [selectedTag, setSelectedTag] = useState(initialTag || "Todos");
   const [checkins, setCheckins] = useState(initialCheckins);
   const [error, setError] = useState(initialError);
   const [loading, setLoading] = useState(false);
