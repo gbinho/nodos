@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckinCard } from "@/components/CheckinCard";
 import type { CheckinWithProfile } from "@/lib/checkins";
 
@@ -8,12 +8,22 @@ type FeedTabsProps = {
   globalCheckins: CheckinWithProfile[];
   followingCheckins: CheckinWithProfile[];
   currentUserId: string;
-  error: string | null;
+  globalError: string | null;
+  followingError: string | null;
 };
 
-export function FeedTabs({ globalCheckins, followingCheckins, currentUserId, error }: FeedTabsProps) {
+export function FeedTabs({ globalCheckins, followingCheckins, currentUserId, globalError, followingError }: FeedTabsProps) {
   const [view, setView] = useState<"global" | "following">("global");
-  const checkins = view === "global" ? globalCheckins : followingCheckins;
+  const [currentGlobalCheckins, setCurrentGlobalCheckins] = useState(globalCheckins);
+  const [currentFollowingCheckins, setCurrentFollowingCheckins] = useState(followingCheckins);
+
+  useEffect(() => {
+    setCurrentGlobalCheckins(globalCheckins);
+    setCurrentFollowingCheckins(followingCheckins);
+  }, [globalCheckins, followingCheckins]);
+
+  const checkins = view === "global" ? currentGlobalCheckins : currentFollowingCheckins;
+  const error = view === "global" ? globalError : followingError;
 
   return (
     <section>

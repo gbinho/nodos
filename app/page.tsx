@@ -41,7 +41,8 @@ export default async function HomePage() {
         globalCheckins={globalCheckins}
         followingCheckins={followingCheckins}
         currentUserId={user.id}
-        error={followsError?.message ?? globalError?.message ?? followingError?.message ?? null}
+        globalError={globalError?.message ?? null}
+        followingError={followsError?.message ?? followingError?.message ?? null}
       />
     </main>
   );
