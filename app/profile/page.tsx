@@ -1,5 +1,6 @@
 import { Activity, Clock3, Crown, Mail, Music2, User } from "lucide-react";
 import { CheckinCard } from "@/components/CheckinCard";
+import { HobbyHeatmap } from "@/components/HobbyHeatmap";
 import SetupEnvPage from "@/components/SetupEnvPage";
 import { getSessionUser } from "@/lib/auth";
 import { displayName, formatMinutes, type CheckinWithProfile } from "@/lib/checkins";
@@ -108,6 +109,8 @@ export default async function ProfilePage() {
           </div>
         </article>
       </section>
+
+      <HobbyHeatmap userId={user.id} />
 
       <section>
         <div className="mb-5 flex items-end justify-between gap-4">
