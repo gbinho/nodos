@@ -32,6 +32,22 @@ export type CommentRow = {
   user_id: string;
   content: string;
   created_at: string;
+  edited_at: string | null;
+  edit_count: number;
+};
+
+export type CommentReactionRow = {
+  id: string;
+  comment_id: string;
+  user_id: string;
+  reaction_type: "like";
+};
+
+export type CheckinVoteRow = {
+  id: string;
+  checkin_id: string;
+  user_id: string;
+  vote_type: "up" | "down";
 };
 
 export type BadgeRow = {
@@ -136,12 +152,16 @@ export type Database = {
           user_id: string;
           content: string;
           created_at?: string;
+          edited_at?: string | null;
+          edit_count?: number;
         };
         Update: {
           checkin_id?: string;
           user_id?: string;
           content?: string;
           created_at?: string;
+          edited_at?: string | null;
+          edit_count?: number;
         };
         Relationships: [];
       };
@@ -186,6 +206,36 @@ export type Database = {
           follower_id?: string;
           following_id?: string;
           created_at?: string;
+        };
+        Relationships: [];
+      };
+      comment_reactions: {
+        Row: CommentReactionRow;
+        Insert: {
+          id?: string;
+          comment_id: string;
+          user_id: string;
+          reaction_type?: "like";
+        };
+        Update: {
+          comment_id?: string;
+          user_id?: string;
+          reaction_type?: "like";
+        };
+        Relationships: [];
+      };
+      checkin_votes: {
+        Row: CheckinVoteRow;
+        Insert: {
+          id?: string;
+          checkin_id: string;
+          user_id: string;
+          vote_type: CheckinVoteRow["vote_type"];
+        };
+        Update: {
+          checkin_id?: string;
+          user_id?: string;
+          vote_type?: CheckinVoteRow["vote_type"];
         };
         Relationships: [];
       };
