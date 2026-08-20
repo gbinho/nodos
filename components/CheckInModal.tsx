@@ -1,21 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { CHECKIN_BUCKET, HOBBY_TAGS, TIME_MAX, TIME_MIN } from "@/lib/constants";
+import { CHECKIN_BUCKET, HOBBY_TAGS, TIME_OPTIONS, xpForMinutes } from "@/lib/constants";
 import { createSupabaseClient } from "@/lib/supabase";
 
 type CheckInModalProps = {
   userId: string;
   currentXp: number;
   onClose: () => void;
+  onSaved: (xpGained: number) => void;
 };
 
-export function CheckInModal({ userId, currentXp, onClose }: CheckInModalProps) {
-  const router = useRouter();
+export function CheckInModal({ userId, currentXp, onClose, onSaved }: CheckInModalProps) {
   const [description, setDescription] = useState("");
   const [hobbyTag, setHobbyTag] = useState<(typeof HOBBY_TAGS)[number]>(HOBBY_TAGS[0]);
-  const [minutes, setMinutes] = useState(30);
+  const [minutes, setMinutes] = useState<(typeof TIME_OPTIONS)[number]>(30);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -56,15 +55,16 @@ export function CheckInModal({ userId, currentXp, onClose }: CheckInModalProps) 
 
       if (insertError) throw insertError;
 
+      const xpGained = xpForMinutes(minutes);
       const { error: xpError } = await supabase
         .from("profiles")
-        .update({ total_xp: currentXp + minutes })
+        .update({ total_xp: currentXp + xpGained })
         .eq("id", userId);
 
       if (xpError) throw xpError;
 
+      onSaved(xpGained);
       onClose();
-      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Não foi possível salvar o check-in.");
     } finally {
@@ -104,35 +104,44 @@ export function CheckInModal({ userId, currentXp, onClose }: CheckInModalProps) 
             />
           </label>
 
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="text-gray-400">Hobby</span>
-            <select
-              value={hobbyTag}
-              onChange={(e) => setHobbyTag(e.target.value as (typeof HOBBY_TAGS)[number])}
-              className="border border-gray-800 bg-black px-3 py-2 text-white outline-none focus:border-gray-400"
-            >
+          <fieldset className="flex flex-col gap-2 text-sm">
+            <legend className="text-gray-400">Nicho</legend>
+            <div className="flex flex-wrap gap-2">
               {HOBBY_TAGS.map((tag) => (
-                <option key={tag} value={tag}>
+                <button
+                  key={tag}
+                  type="button"
+                  aria-pressed={hobbyTag === tag}
+                  onClick={() => setHobbyTag(tag)}
+                  className={`border px-3 py-1.5 text-xs transition-colors ${
+                    hobbyTag === tag
+                      ? "border-white bg-white text-black"
+                      : "border-gray-800 text-gray-400 hover:border-gray-400 hover:text-white"
+                  }`}
+                >
                   {tag}
-                </option>
+                </button>
               ))}
-            </select>
-          </label>
+            </div>
+          </fieldset>
 
           <label className="flex flex-col gap-2 text-sm">
             <span className="flex justify-between text-gray-400">
               Tempo investido
-              <span className="text-white">{minutes} min</span>
+              <span className="text-white">{minutes === 120 ? "120+ min" : `${minutes} min`}</span>
             </span>
             <input
               type="range"
-              min={TIME_MIN}
-              max={TIME_MAX}
-              step={5}
-              value={minutes}
-              onChange={(e) => setMinutes(Number(e.target.value))}
+              min={0}
+              max={TIME_OPTIONS.length - 1}
+              step={1}
+              value={TIME_OPTIONS.indexOf(minutes)}
+              onChange={(e) => setMinutes(TIME_OPTIONS[Number(e.target.value)])}
               className="accent-white"
             />
+            <div className="flex justify-between text-[10px] text-gray-500">
+              {TIME_OPTIONS.map((option) => <span key={option}>{option === 120 ? "120+" : option}</span>)}
+            </div>
           </label>
 
           {error ? <p className="text-sm text-gray-400">{error}</p> : null}

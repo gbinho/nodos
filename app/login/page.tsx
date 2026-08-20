@@ -1,5 +1,5 @@
 import { LoginForm } from "@/components/LoginForm";
-import { SetupEnvPage } from "@/components/SetupEnvPage";
+import SetupEnvPage from "@/components/SetupEnvPage";
 import { getSupabaseEnv } from "@/lib/env";
 
 export default function LoginPage() {

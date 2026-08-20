@@ -1,6 +1,6 @@
 import { AddCheckInButton } from "@/components/AddCheckInButton";
 import { CheckinCard } from "@/components/CheckinCard";
-import { SetupEnvPage } from "@/components/SetupEnvPage";
+import SetupEnvPage from "@/components/SetupEnvPage";
 import { getSessionUser } from "@/lib/auth";
 import type { CheckinWithProfile } from "@/lib/checkins";
 
