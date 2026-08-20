@@ -104,7 +104,7 @@ export default async function ProfilePage() {
             <h2 className="mt-8 text-2xl font-medium">{name}</h2>
             <p className="mt-2 flex items-center gap-2 text-sm text-gray-300">
               <Mail className="h-3.5 w-3.5" strokeWidth={1.5} />
-              {profile?.email ?? "E-mail não informado"}
+              {profile?.email_public ? profile.email ?? "E-mail não informado" : "E-mail oculto"}
             </p>
           </div>
         </article>

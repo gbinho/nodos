@@ -1,6 +1,7 @@
 export type ProfileRow = {
   id: string;
   email: string | null;
+  email_public: boolean;
   username: string | null;
   avatar_url: string | null;
   spotify_url: string | null;
@@ -58,6 +59,7 @@ export type Database = {
         Insert: {
           id: string;
           email?: string | null;
+          email_public?: boolean;
           username?: string | null;
           avatar_url?: string | null;
           spotify_url?: string | null;
@@ -66,6 +68,7 @@ export type Database = {
         };
         Update: {
           email?: string | null;
+          email_public?: boolean;
           username?: string | null;
           avatar_url?: string | null;
           spotify_url?: string | null;

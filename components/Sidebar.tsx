@@ -69,6 +69,12 @@ export function Sidebar({ profile }: SidebarProps) {
         >
           Explorar Nodes
         </Link>
+        <Link
+          href="/settings"
+          className={pathname === "/settings" ? "text-sm text-white" : "text-sm text-gray-400 hover:text-white"}
+        >
+          Configurações
+        </Link>
       </nav>
 
       <button
