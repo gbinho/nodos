@@ -51,14 +51,14 @@ export default async function ProfilePage() {
   const backgroundUrl = getSafeBackgroundUrl(profile?.bg_gif_url);
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-10">
+    <main className="mx-auto flex max-w-6xl flex-col gap-10">
       <header className="flex items-end justify-between gap-6">
         <div>
-          <p className="text-xs tracking-[0.22em] text-gray-500">PERFIL</p>
-          <h1 className="mt-3 text-3xl font-medium tracking-tight">Seu percurso</h1>
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#71737c]">PERFIL</p>
+          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.06em] text-[#111114]">Seu percurso</h1>
         </div>
         <div className="flex items-center gap-4">
-          <p className="hidden text-right text-sm text-gray-500 sm:block">Progresso pessoal</p>
+          <p className="hidden text-right text-sm text-[#71737c] sm:block">Progresso pessoal</p>
           {profile ? <EditProfileButton profile={profile} /> : null}
         </div>
       </header>
@@ -99,7 +99,7 @@ export default async function ProfilePage() {
           </div>
         </article>
 
-        <article className="border border-gray-800 bg-gray-900 p-6 md:col-span-3">
+        <article className="rounded-2xl border border-[#e4e5e9] bg-[#111114] p-6 text-white md:col-span-3">
           <div className="flex items-start justify-between">
             <span className="text-xs text-gray-500">GAMIFICAÇÃO</span>
             <Crown className="h-5 w-5 text-gray-300" strokeWidth={1.5} />
@@ -119,7 +119,7 @@ export default async function ProfilePage() {
           </div>
         </article>
 
-        <article className="border border-gray-800 p-6 md:col-span-2">
+        <article className="rounded-2xl border border-[#e4e5e9] bg-white p-6 md:col-span-2">
           <div className="flex items-center justify-between">
             <span className="text-xs text-gray-500">TEMPO TOTAL</span>
             <Clock3 className="h-5 w-5 text-gray-400" strokeWidth={1.5} />
@@ -128,7 +128,7 @@ export default async function ProfilePage() {
           <p className="mt-1 text-sm text-gray-500">{formatMinutes(totalMinutes)} investidos</p>
         </article>
 
-        <article className="border border-gray-800 p-6 md:col-span-2">
+        <article className="rounded-2xl border border-[#e4e5e9] bg-white p-6 md:col-span-2">
           <div className="flex items-center justify-between">
             <span className="text-xs text-gray-500">ATIVIDADE</span>
             <Activity className="h-5 w-5 text-gray-400" strokeWidth={1.5} />
@@ -137,7 +137,7 @@ export default async function ProfilePage() {
           <p className="mt-1 text-sm text-gray-500">check-ins registrados</p>
         </article>
 
-        <article className="flex min-h-40 flex-col border border-gray-800 bg-gray-950 p-6 md:col-span-2">
+        <article className="flex min-h-40 flex-col rounded-2xl border border-[#e4e5e9] bg-white p-6 md:col-span-2">
           <div className="flex items-center justify-between">
             <span className="text-xs text-gray-500">MÚSICA TEMA</span>
             <Music2 className="h-5 w-5 text-gray-400" strokeWidth={1.5} />
@@ -151,9 +151,9 @@ export default async function ProfilePage() {
               loading="lazy"
             />
           ) : (
-            <div className="mt-auto flex items-center justify-between gap-4 border-t border-gray-800 pt-4">
-              <p className="text-sm text-gray-400">Nenhuma faixa conectada</p>
-              <span className="text-xs text-gray-600">SPOTIFY</span>
+            <div className="mt-auto flex items-center justify-between gap-4 border-t border-[#ececf0] pt-4">
+              <p className="text-sm text-[#71737c]">Nenhuma faixa conectada</p>
+              <span className="text-xs text-[#a0a1a8]">SPOTIFY</span>
             </div>
           )}
         </article>

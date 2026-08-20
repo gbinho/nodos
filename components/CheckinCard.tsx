@@ -240,16 +240,16 @@ export function CheckinCard({ checkin, currentUserId }: { checkin: CheckinWithPr
   }
 
   return (
-    <article className="border border-gray-800">
+    <article className="overflow-hidden rounded-2xl border border-[#e4e5e9] bg-white shadow-[0_8px_30px_rgba(22,22,28,0.06)]">
       {checkin.image_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={checkin.image_url} alt="" className="max-h-80 w-full object-cover" />
       ) : null}
       <div className="p-5">
-        <div className="flex items-baseline justify-between gap-3"><Link href={checkin.user_id ? `/users/${checkin.user_id}` : "#"} className="text-sm text-white hover:underline">@{name}</Link><p className="text-xs text-gray-400">{formatWhen(checkin.created_at)}</p></div>
-        <p className="mt-2 text-xs text-gray-400">{checkin.hobby_tag ?? "Hobby"} · {formatMinutes(checkin.time_invested_minutes)}</p>
-        {checkin.description ? <p className="mt-3 text-sm text-gray-400">{checkin.description}</p> : null}
-        <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-gray-800 pt-4">
+        <div className="flex items-baseline justify-between gap-3"><Link href={checkin.user_id ? `/users/${checkin.user_id}` : "#"} className="text-sm font-medium text-[#111114] hover:underline">@{name}</Link><p className="text-xs text-[#8b8d96]">{formatWhen(checkin.created_at)}</p></div>
+        <p className="mt-2 text-xs text-[#555760]">#{checkin.hobby_tag ?? "Hobby"} · {formatMinutes(checkin.time_invested_minutes)}</p>
+        {checkin.description ? <p className="mt-3 text-sm leading-relaxed text-[#555760]">{checkin.description}</p> : null}
+        <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-[#ececf0] pt-4">
           <button type="button" onClick={() => void votePost("up")} className={`flex items-center gap-1 text-xs ${myVote === "up" ? "text-white" : "text-gray-500 hover:text-white"}`}><ArrowBigUp className="h-4 w-4" fill={myVote === "up" ? "currentColor" : "none"} strokeWidth={1.5} />{voteCounts.up}</button>
           <button type="button" onClick={() => void votePost("down")} className={`flex items-center gap-1 text-xs ${myVote === "down" ? "text-white" : "text-gray-500 hover:text-white"}`}><ArrowBigDown className="h-4 w-4" fill={myVote === "down" ? "currentColor" : "none"} strokeWidth={1.5} />{voteCounts.down}</button>
           {reactionOptions.map(({ type, label, emoji }) => <button key={type} type="button" onClick={() => void toggleReaction(type)} disabled={loading || reactionLoading !== null} aria-pressed={myReaction === type} className={`border px-2.5 py-1.5 text-xs transition-colors ${myReaction === type ? "border-white bg-white text-black" : "border-gray-800 text-gray-400 hover:border-gray-500 hover:text-white"}`}>{reactionLoading === type ? "..." : `${emoji} ${label} ${counts[type]}`}</button>)}

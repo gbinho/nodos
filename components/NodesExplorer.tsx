@@ -66,13 +66,13 @@ export function NodesExplorer({ currentUserId, initialCheckins, initialError, ta
   const currentNode = selectedTag === "Todos" ? "Todos os Nodes" : selectedTag;
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-8">
+    <main className="mx-auto flex max-w-6xl flex-col gap-8">
       <header>
-        <p className="text-xs tracking-[0.22em] text-gray-500">EXPLORAR</p>
+        <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#71737c]">EXPLORAR</p>
         <div className="mt-3 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
-            <h1 className="text-3xl font-medium tracking-tight">Nodes</h1>
-            <p className="mt-2 text-sm text-gray-400">Encontre progresso acontecendo nos seus nichos.</p>
+            <h1 className="text-4xl font-semibold tracking-[-0.06em] text-[#111114]">Nodes</h1>
+            <p className="mt-2 text-sm text-[#71737c]">Encontre progresso acontecendo nos seus nichos.</p>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Users className="h-4 w-4" strokeWidth={1.5} />
@@ -81,7 +81,7 @@ export function NodesExplorer({ currentUserId, initialCheckins, initialError, ta
         </div>
       </header>
 
-      <nav aria-label="Filtrar Nodes" className="flex flex-wrap gap-2 border-y border-gray-800 py-4">
+      <nav aria-label="Filtrar Nodes" className="flex flex-wrap gap-2 border-y border-[#e4e5e9] py-4">
         {["Todos", ...tags].map((tag) => (
           <button
             key={tag}
@@ -90,8 +90,8 @@ export function NodesExplorer({ currentUserId, initialCheckins, initialError, ta
             onClick={() => setSelectedTag(tag)}
             className={`border px-3 py-2 text-xs transition-colors ${
               selectedTag === tag
-                ? "border-white bg-white text-black"
-                : "border-gray-800 text-gray-400 hover:border-gray-500 hover:text-white"
+                ? "border-[#111114] bg-[#111114] text-white"
+                : "border-[#e0e1e6] bg-white text-[#71737c] hover:border-[#111114] hover:text-[#111114]"
             }`}
           >
             {tag}
@@ -100,7 +100,7 @@ export function NodesExplorer({ currentUserId, initialCheckins, initialError, ta
       </nav>
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Estatísticas do Node">
-        <article className="border border-gray-800 bg-gray-950 p-5 sm:col-span-2">
+        <article className="rounded-2xl border border-[#e4e5e9] bg-[#111114] p-5 text-white sm:col-span-2">
           <div className="flex items-center gap-2 text-xs tracking-[0.16em] text-gray-500">
             <Activity className="h-4 w-4" strokeWidth={1.5} />
             NODE ATUAL
@@ -108,7 +108,7 @@ export function NodesExplorer({ currentUserId, initialCheckins, initialError, ta
           <h2 className="mt-5 text-2xl font-medium">{currentNode}</h2>
           <p className="mt-2 text-sm text-gray-400">{checkins.length} check-ins compartilhados pela comunidade</p>
         </article>
-        <article className="border border-gray-800 p-5">
+        <article className="rounded-2xl border border-[#e4e5e9] bg-white p-5">
           <div className="flex items-center gap-2 text-xs tracking-[0.16em] text-gray-500">
             <Clock3 className="h-4 w-4" strokeWidth={1.5} />
             TEMPO ACUMULADO
@@ -127,9 +127,9 @@ export function NodesExplorer({ currentUserId, initialCheckins, initialError, ta
           {loading ? <LoaderCircle className="h-5 w-5 animate-spin text-gray-400" /> : null}
         </div>
         {error ? (
-          <div className="border border-gray-800 p-6 text-sm text-gray-400">Não foi possível carregar este Node.</div>
+          <div className="rounded-2xl border border-[#e4e5e9] bg-white p-6 text-sm text-[#71737c]">Não foi possível carregar este Node.</div>
         ) : checkins.length === 0 ? (
-          <div className="border border-gray-800 px-6 py-16 text-center text-sm text-gray-400">
+          <div className="rounded-2xl border border-[#e4e5e9] bg-white px-6 py-16 text-center text-sm text-[#71737c]">
             Ainda não há check-ins neste Node.
           </div>
         ) : (

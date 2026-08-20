@@ -24,13 +24,13 @@ export default async function RootLayout({
 
   return (
     <html lang="pt-BR">
-      <body className={`${spaceGrotesk.variable} ${spaceGrotesk.className} antialiased bg-black text-white`}>
+      <body className={`${spaceGrotesk.variable} ${spaceGrotesk.className} antialiased`}>
         {!configured || !user ? (
           children
         ) : (
-          <div className="flex min-h-screen">
+          <div className="flex min-h-screen flex-col gap-3 bg-white p-3 text-[#111114] sm:p-5 lg:flex-row lg:gap-0 lg:p-7">
             <Sidebar profile={profile} />
-            <div className="min-w-0 flex-1 px-8 py-10">{children}</div>
+            <div className="min-h-0 min-w-0 flex-1 rounded-[28px] bg-[#f7f8fa] px-5 py-7 sm:px-8 sm:py-9 lg:min-h-[calc(100vh-3.5rem)] lg:rounded-l-none lg:rounded-r-[28px] lg:px-12 lg:py-11">{children}</div>
             <OnlineUsers userId={user.id} />
           </div>
         )}

@@ -20,7 +20,7 @@ export function AddCheckInButton({ userId, currentXp }: { userId: string; curren
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="w-full border border-white py-4 text-sm tracking-wide hover:bg-white hover:text-black"
+        className="w-full rounded-xl border border-[#111114] bg-[#111114] py-3.5 text-sm font-medium tracking-wide text-white transition hover:bg-[#2a2b31]"
       >
         [+ Adicionar Check-in]
       </button>
@@ -33,7 +33,7 @@ export function AddCheckInButton({ userId, currentXp }: { userId: string; curren
         />
       ) : null}
       {toast ? (
-        <div role="status" className="fixed bottom-6 right-6 z-50 border border-white bg-black px-4 py-3 text-sm text-white">
+        <div role="status" className="fixed bottom-6 right-6 z-50 rounded-xl border border-[#111114] bg-[#111114] px-4 py-3 text-sm text-white shadow-xl">
           {toast}
         </div>
       ) : null}

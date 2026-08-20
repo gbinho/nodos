@@ -29,10 +29,17 @@ export default async function HomePage() {
   const followingCheckins = (followingData ?? []) as CheckinWithProfile[];
 
   return (
-    <main className="mx-auto flex max-w-xl flex-col gap-8">
-      <div>
-        <h1 className="text-2xl font-medium tracking-tight">Feed</h1>
-        <p className="mt-1 text-sm text-gray-400">Check-ins da jornada</p>
+    <main className="mx-auto flex max-w-6xl flex-col gap-7">
+      <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#71737c]">Nodos / comunidade</p>
+          <h1 className="mt-2 text-4xl font-semibold tracking-[-0.06em] text-[#111114]">Home</h1>
+          <p className="mt-2 text-sm text-[#71737c]">Acompanhe o progresso que está acontecendo agora.</p>
+        </div>
+        <div className="hidden items-center gap-2 rounded-full border border-[#e4e5e9] bg-white px-4 py-2 text-xs text-[#71737c] sm:flex">
+          <span className="h-2 w-2 rounded-full bg-[#111114]" />
+          Feed atualizado
+        </div>
       </div>
 
       <AddCheckInButton userId={user.id} currentXp={profile?.total_xp ?? 0} />
