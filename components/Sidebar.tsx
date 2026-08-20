@@ -70,6 +70,12 @@ export function Sidebar({ profile }: SidebarProps) {
           Explorar Nodes
         </Link>
         <Link
+          href="/search"
+          className={pathname === "/search" ? "text-sm text-white" : "text-sm text-gray-400 hover:text-white"}
+        >
+          Buscar pessoas
+        </Link>
+        <Link
           href="/settings"
           className={pathname === "/settings" ? "text-sm text-white" : "text-sm text-gray-400 hover:text-white"}
         >

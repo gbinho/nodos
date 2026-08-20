@@ -51,6 +51,13 @@ export type UserBadgeRow = {
   unlocked_at: string;
 };
 
+export type FollowRow = {
+  id: string;
+  follower_id: string;
+  following_id: string;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -164,6 +171,21 @@ export type Database = {
           user_id?: string;
           badge_id?: string;
           unlocked_at?: string;
+        };
+        Relationships: [];
+      };
+      follows: {
+        Row: FollowRow;
+        Insert: {
+          id?: string;
+          follower_id: string;
+          following_id: string;
+          created_at?: string;
+        };
+        Update: {
+          follower_id?: string;
+          following_id?: string;
+          created_at?: string;
         };
         Relationships: [];
       };

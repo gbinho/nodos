@@ -21,6 +21,17 @@ function validUrl(value: string) {
   }
 }
 
+function normalizeUsername(value: string) {
+  return value.trim().replace(/^@+/, "").toLowerCase();
+}
+
+function saveErrorMessage(error: unknown) {
+  if (typeof error === "object" && error !== null && "code" in error && String(error.code) === "23505") {
+    return "Este username já está em uso. Escolha outro.";
+  }
+  return error instanceof Error ? error.message : "Não foi possível salvar as configurações.";
+}
+
 export function AccountSettings({ profile, authEmail }: AccountSettingsProps) {
   const router = useRouter();
   const [username, setUsername] = useState(profile.username ?? "");
@@ -38,7 +49,7 @@ export function AccountSettings({ profile, authEmail }: AccountSettingsProps) {
     event.preventDefault();
     setStatus(null);
     setError(null);
-    const cleanUsername = username.trim();
+    const cleanUsername = normalizeUsername(username);
     const cleanAvatarUrl = avatarUrl.trim();
     if (!cleanUsername) {
       setError("Informe um username.");
@@ -64,7 +75,7 @@ export function AccountSettings({ profile, authEmail }: AccountSettingsProps) {
       setStatus("Configurações salvas.");
       router.refresh();
     } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : "Não foi possível salvar as configurações.");
+      setError(saveErrorMessage(saveError));
     } finally {
       setSaving(false);
     }

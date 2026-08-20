@@ -1,5 +1,5 @@
 import { AddCheckInButton } from "@/components/AddCheckInButton";
-import { CheckinCard } from "@/components/CheckinCard";
+import { FeedTabs } from "@/components/FeedTabs";
 import SetupEnvPage from "@/components/SetupEnvPage";
 import { getSessionUser } from "@/lib/auth";
 import type { CheckinWithProfile } from "@/lib/checkins";
@@ -12,12 +12,21 @@ export default async function HomePage() {
   if (!configured) return <SetupEnvPage />;
   if (!user || !supabase) return null;
 
-  const { data, error } = await supabase
+  const { data: followRows, error: followsError } = await supabase
+    .from("follows")
+    .select("following_id")
+    .eq("follower_id", user.id);
+  const followingIds = (followRows ?? []).map((follow) => follow.following_id);
+  const globalQuery = supabase
     .from("checkins")
     .select("*, profiles(username, avatar_url, email)")
     .order("created_at", { ascending: false });
-
-  const checkins = (data ?? []) as CheckinWithProfile[];
+  const followingQuery = followingIds.length
+    ? supabase.from("checkins").select("*, profiles(username, avatar_url, email)").in("user_id", followingIds).order("created_at", { ascending: false })
+    : Promise.resolve({ data: [], error: null });
+  const [{ data: globalData, error: globalError }, { data: followingData, error: followingError }] = await Promise.all([globalQuery, followingQuery]);
+  const globalCheckins = (globalData ?? []) as CheckinWithProfile[];
+  const followingCheckins = (followingData ?? []) as CheckinWithProfile[];
 
   return (
     <main className="mx-auto flex max-w-xl flex-col gap-8">
@@ -28,19 +37,12 @@ export default async function HomePage() {
 
       <AddCheckInButton userId={user.id} currentXp={profile?.total_xp ?? 0} />
 
-      {error ? (
-        <p className="text-sm text-gray-400">Não foi possível carregar o feed.</p>
-      ) : checkins.length === 0 ? (
-        <div className="border border-gray-800 px-6 py-16 text-center text-sm text-gray-400">
-          Nenhum check-in ainda
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4">
-          {checkins.map((checkin) => (
-            <CheckinCard key={checkin.id} checkin={checkin} currentUserId={user.id} />
-          ))}
-        </div>
-      )}
+      <FeedTabs
+        globalCheckins={globalCheckins}
+        followingCheckins={followingCheckins}
+        currentUserId={user.id}
+        error={followsError?.message ?? globalError?.message ?? followingError?.message ?? null}
+      />
     </main>
   );
 }
