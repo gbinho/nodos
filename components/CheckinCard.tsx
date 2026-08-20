@@ -2,7 +2,8 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowBigDown, ArrowBigUp, Heart, LoaderCircle, MessageCircle, Pencil, Send, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowBigDown, ArrowBigUp, Heart, LoaderCircle, MessageCircle, Pencil, Pin, Send, Trash2 } from "lucide-react";
 import { displayName, formatMinutes, formatWhen, type CheckinWithProfile } from "@/lib/checkins";
 import type { CheckinVoteRow, CommentReactionRow, CommentRow, ProfileRow, ReactionRow } from "@/lib/database.types";
 import { createSupabaseClient } from "@/lib/supabase";
@@ -40,7 +41,16 @@ function engagementErrorMessage(error: unknown, action: "comment" | "load") {
   return action === "comment" ? "Não foi possível enviar o comentário." : "Não foi possível carregar o engajamento.";
 }
 
-export function CheckinCard({ checkin, currentUserId }: { checkin: CheckinWithProfile; currentUserId: string }) {
+type CheckinCardProps = {
+  checkin: CheckinWithProfile;
+  currentUserId: string;
+  gallery?: boolean;
+  showPin?: boolean;
+  featuredCount?: number;
+};
+
+export function CheckinCard({ checkin, currentUserId, gallery = false, showPin = false, featuredCount = 0 }: CheckinCardProps) {
+  const router = useRouter();
   const name = displayName(checkin.profiles);
   const [counts, setCounts] = useState<ReactionCount>(emptyCounts);
   const [myReaction, setMyReaction] = useState<ReactionType | null>(null);
@@ -52,6 +62,8 @@ export function CheckinCard({ checkin, currentUserId }: { checkin: CheckinWithPr
   const [commentLoading, setCommentLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
+  const [featured, setFeatured] = useState(checkin.is_featured);
+  const [pinLoading, setPinLoading] = useState(false);
   const [commentLikes, setCommentLikes] = useState<Record<string, number>>({});
   const [likedComments, setLikedComments] = useState(new Set<string>());
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
@@ -239,18 +251,37 @@ export function CheckinCard({ checkin, currentUserId }: { checkin: CheckinWithPr
     }
   }
 
+  async function toggleFeatured() {
+    setPinLoading(true);
+    setError(null);
+    try {
+      const supabase = createSupabaseClient();
+      const { error: updateError } = await supabase.from("checkins").update({ is_featured: !featured }).eq("id", checkin.id).eq("user_id", currentUserId);
+      if (updateError) throw updateError;
+      setFeatured((current) => !current);
+      router.refresh();
+    } catch (pinError) {
+      const message = pinError instanceof Error ? pinError.message : "Não foi possível atualizar o destaque.";
+      setError(message.includes("featured_checkins_limit_reached") ? "Você já tem 3 destaques. Desfixe um para destacar este." : message);
+    } finally {
+      setPinLoading(false);
+    }
+  }
+
   return (
-    <article className="feed-card overflow-hidden rounded-2xl border border-[#e4e5e9] bg-white shadow-[0_8px_30px_rgba(22,22,28,0.06)]">
+    <article className={`feed-card overflow-hidden rounded-2xl border bg-white shadow-[0_8px_30px_rgba(22,22,28,0.06)] ${featured ? "border-[#111114]" : "border-[#e4e5e9]"}`}>
       {checkin.image_url ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <div className="flex max-h-[450px] min-h-40 items-center justify-center overflow-hidden bg-black/5">
-          <img src={checkin.image_url} alt="" className="max-h-[450px] w-full object-contain transition-transform duration-500 hover:scale-[1.01]" />
+        <div className={`flex items-center justify-center overflow-hidden bg-black/5 ${gallery ? "h-52" : "max-h-[450px] min-h-40"}`}>
+          <img src={checkin.image_url} alt="" className={`${gallery ? "h-full" : "max-h-[450px]"} w-full object-contain transition-transform duration-500 hover:scale-[1.01]`} />
         </div>
       ) : null}
-      <div className="p-5">
+      <div className={gallery ? "p-4" : "p-5"}>
         <div className="flex items-baseline justify-between gap-3"><Link href={checkin.user_id ? `/users/${checkin.user_id}` : "#"} className="text-sm font-medium text-[#111114] hover:underline">@{name}</Link><p className="text-xs text-[#8b8d96]">{formatWhen(checkin.created_at)}</p></div>
         <p className="mt-2 text-xs text-[#555760]">#{checkin.hobby_tag ?? "Hobby"} · {formatMinutes(checkin.time_invested_minutes)}</p>
-        {checkin.description ? <p className="mt-3 text-sm leading-relaxed text-[#555760]">{checkin.description}</p> : null}
+        {!gallery && checkin.description ? <p className="mt-3 text-sm leading-relaxed text-[#555760]">{checkin.description}</p> : null}
+        {showPin ? <button type="button" onClick={() => void toggleFeatured()} disabled={pinLoading || (!featured && featuredCount >= 3)} className={`mt-3 inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-all active:scale-95 ${featured ? "border-[#111114] bg-[#111114] text-white" : "border-[#d7d8dd] text-[#111114] hover:border-[#111114]"}`}><Pin className="h-3.5 w-3.5" fill={featured ? "currentColor" : "none"} />{pinLoading ? "..." : featured ? "Desfixar" : "Fixar"}</button> : null}
+        {gallery ? <div className="mt-3 flex items-center justify-between border-t border-[#ececf0] pt-3 text-xs text-[#71737c]"><span>{checkin.description ? checkin.description.slice(0, 48) : "Progresso registrado"}</span>{featured ? <Pin className="h-3.5 w-3.5 text-[#111114]" fill="currentColor" /> : null}</div> : null}
         <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-[#ececf0] pt-4">
           <button type="button" onClick={() => void votePost("up")} className={`inline-flex min-w-12 items-center justify-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs transition-all duration-200 active:scale-95 ${myVote === "up" ? "border-red-500 bg-red-500 text-white shadow-[0_4px_12px_rgba(239,68,68,0.25)]" : "border-[#d7d8dd] text-[#111114] hover:border-red-400 hover:text-red-500"}`}><ArrowBigUp className="h-4 w-4" fill={myVote === "up" ? "currentColor" : "none"} strokeWidth={1.8} />{voteCounts.up}</button>
           <button type="button" onClick={() => void votePost("down")} className={`inline-flex min-w-12 items-center justify-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs transition-all duration-200 active:scale-95 ${myVote === "down" ? "border-[#111114] bg-[#111114] text-white" : "border-[#d7d8dd] text-[#111114] hover:border-[#111114]"}`}><ArrowBigDown className="h-4 w-4" fill={myVote === "down" ? "currentColor" : "none"} strokeWidth={1.8} />{voteCounts.down}</button>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import { Sidebar } from "@/components/Sidebar";
 import { OnlineUsers } from "@/components/OnlineUsers";
+import { MobileNav } from "@/components/MobileNav";
 import { getSessionUser } from "@/lib/auth";
 import "./globals.css";
 
@@ -28,10 +29,11 @@ export default async function RootLayout({
         {!configured || !user ? (
           children
         ) : (
-          <div className="flex min-h-screen flex-col gap-3 bg-white p-3 text-[#111114] sm:p-5 lg:flex-row lg:gap-0 lg:p-7">
+          <div className="min-h-screen bg-white p-3 text-[#111114] sm:p-5 lg:p-7">
             <Sidebar profile={profile} />
-            <div className="min-h-0 min-w-0 flex-1 rounded-[28px] bg-[#f7f8fa] px-5 py-7 sm:px-8 sm:py-9 lg:min-h-[calc(100vh-3.5rem)] lg:rounded-l-none lg:rounded-r-[28px] lg:px-12 lg:py-11">{children}</div>
+            <div className="h-[calc(100vh-1.5rem)] overflow-y-auto rounded-[28px] bg-[#f7f8fa] px-5 py-7 pb-28 sm:h-[calc(100vh-2.5rem)] sm:px-8 sm:py-9 md:ml-56 md:h-[calc(100vh-2.5rem)] md:rounded-l-none md:rounded-r-[28px] lg:h-[calc(100vh-3.5rem)] lg:px-12 lg:py-11">{children}</div>
             <OnlineUsers userId={user.id} />
+            <MobileNav userId={user.id} currentXp={profile?.total_xp ?? 0} />
           </div>
         )}
       </body>

@@ -24,7 +24,7 @@ export function Sidebar({ profile }: SidebarProps) {
   }
 
   return (
-    <aside className="flex w-full shrink-0 flex-col rounded-[28px] bg-[#101114] px-4 py-6 text-white lg:min-h-[calc(100vh-3.5rem)] lg:w-56 lg:rounded-l-[28px] lg:rounded-r-none">
+    <aside className="fixed inset-y-5 left-5 z-40 hidden w-56 flex-col rounded-[28px] bg-[#101114] px-4 py-6 text-white md:flex lg:inset-y-7 lg:left-7 lg:min-h-[calc(100vh-3.5rem)] lg:rounded-l-[28px] lg:rounded-r-none">
       <Link href="/" className="px-3 text-lg font-semibold tracking-[-0.06em] text-white">
         nodos<span className="text-white">.</span>
       </Link>

@@ -15,6 +15,7 @@ export type CheckinRow = {
   hobby_tag: string | null;
   description: string | null;
   image_url: string | null;
+  is_featured: boolean;
   time_invested_minutes: number;
   created_at: string;
 };
@@ -108,6 +109,7 @@ export type Database = {
           hobby_tag?: string | null;
           description?: string | null;
           image_url?: string | null;
+          is_featured?: boolean;
           time_invested_minutes?: number;
           created_at?: string;
         };
@@ -116,6 +118,7 @@ export type Database = {
           hobby_tag?: string | null;
           description?: string | null;
           image_url?: string | null;
+          is_featured?: boolean;
           time_invested_minutes?: number;
           created_at?: string;
         };

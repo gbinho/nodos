@@ -71,6 +71,8 @@ export default async function ProfilePage() {
     .order("created_at", { ascending: false });
 
   const checkins = (data ?? []) as CheckinWithProfile[];
+  const featuredCheckins = checkins.filter((checkin) => checkin.is_featured);
+  const featuredCount = featuredCheckins.length;
   const name = displayName(profile);
   const totalXp = profile?.total_xp ?? 0;
   const level = Math.floor(totalXp / 100) + 1;
@@ -242,6 +244,21 @@ export default async function ProfilePage() {
 
       <BadgesGrid userId={user.id} />
 
+      {featuredCheckins.length ? (
+        <section>
+          <div className="mb-5 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#71737c]">⭐ DESTAQUES</p>
+              <h2 className="mt-2 text-xl font-medium text-[#111114]">Mural em destaque</h2>
+            </div>
+            <span className="text-xs text-[#71737c]">{featuredCount}/3 fixados</span>
+          </div>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
+            {featuredCheckins.map((checkin) => <CheckinCard key={checkin.id} checkin={checkin} currentUserId={user.id} showPin featuredCount={featuredCount} />)}
+          </div>
+        </section>
+      ) : null}
+
       <section>
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
@@ -259,9 +276,9 @@ export default async function ProfilePage() {
             Você ainda não registrou nenhum check-in
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
             {checkins.map((checkin) => (
-              <CheckinCard key={checkin.id} checkin={checkin} currentUserId={user.id} />
+              <CheckinCard key={checkin.id} checkin={checkin} currentUserId={user.id} gallery showPin featuredCount={featuredCount} />
             ))}
           </div>
         )}

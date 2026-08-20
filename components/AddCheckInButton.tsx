@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckInModal } from "@/components/CheckInModal";
 
-export function AddCheckInButton({ userId, currentXp }: { userId: string; currentXp: number }) {
+export function AddCheckInButton({ userId, currentXp, className, compact = false }: { userId: string; currentXp: number; className?: string; compact?: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -20,9 +20,9 @@ export function AddCheckInButton({ userId, currentXp }: { userId: string; curren
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="w-full rounded-xl border border-[#111114] bg-[#111114] py-3.5 text-sm font-medium tracking-wide text-white transition hover:bg-[#2a2b31]"
+        className={className ?? "w-full rounded-xl border border-[#111114] bg-[#111114] py-3.5 text-sm font-medium tracking-wide text-white transition hover:bg-[#2a2b31]"}
       >
-        [+ Adicionar Check-in]
+        {compact ? "+" : "[+ Adicionar Check-in]"}
       </button>
       {open ? (
         <CheckInModal
