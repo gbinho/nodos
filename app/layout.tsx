@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import { Sidebar } from "@/components/Sidebar";
+import { OnlineUsers } from "@/components/OnlineUsers";
 import { getSessionUser } from "@/lib/auth";
 import "./globals.css";
 
@@ -30,6 +31,7 @@ export default async function RootLayout({
           <div className="flex min-h-screen">
             <Sidebar profile={profile} />
             <div className="min-w-0 flex-1 px-8 py-10">{children}</div>
+            <OnlineUsers userId={user.id} />
           </div>
         )}
       </body>
