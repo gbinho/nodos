@@ -42,11 +42,11 @@ export default async function PublicUserPage({ params }: { params: Promise<{ id:
           // eslint-disable-next-line @next/next/no-img-element
           <img src={backgroundUrl} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
         ) : null}
-        {backgroundUrl ? <div className="absolute inset-0 bg-black/70" aria-hidden="true" /> : null}
+        {backgroundUrl ? <div className="absolute inset-0 bg-black/35" aria-hidden="true" /> : null}
         <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-5">
             <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-gray-700 bg-gray-900">{publicProfile.avatar_url ? <><span className="sr-only">Avatar de {publicProfile.username ?? "usuário"}</span>{/* eslint-disable-next-line @next/next/no-img-element */}<img src={publicProfile.avatar_url} alt="" className="h-full w-full object-cover" /></> : <User className="h-8 w-8 text-gray-500" strokeWidth={1.25} />}</div>
-            <div><h1 className="text-2xl font-medium">@{publicProfile.username ?? "usuário"}</h1>{publicProfile.email_public && publicProfile.email ? <p className="mt-2 flex items-center gap-2 text-sm text-gray-300"><Mail className="h-3.5 w-3.5" strokeWidth={1.5} />{publicProfile.email}</p> : null}<p className="mt-2 text-sm text-gray-400">{totalXp} XP</p></div>
+            <div><h1 className="text-2xl font-medium text-white">@{publicProfile.username ?? "usuário"}</h1>{publicProfile.email_public && publicProfile.email ? <p className="mt-2 flex items-center gap-2 text-sm text-gray-300"><Mail className="h-3.5 w-3.5" strokeWidth={1.5} />{publicProfile.email}</p> : null}<p className="mt-2 text-sm text-gray-400">{totalXp} XP</p></div>
           </div>
           {user.id !== id ? <PublicProfileActions currentUserId={user.id} profileId={id} initiallyFollowing={Boolean(follow)} /> : <Link href="/profile" className="text-sm text-gray-400 hover:text-white">Ver meu perfil</Link>}
         </div>

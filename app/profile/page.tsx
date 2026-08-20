@@ -1,4 +1,4 @@
-import { Activity, Clock3, Crown, Mail, Music2, User } from "lucide-react";
+import { Activity, Clock3, Crown, Flame, Mail, Music2, User } from "lucide-react";
 import { CheckinCard } from "@/components/CheckinCard";
 import { BadgesGrid } from "@/components/BadgesGrid";
 import { EditProfileButton } from "@/components/EditProfileButton";
@@ -21,6 +21,39 @@ function getSafeBackgroundUrl(value: string | null | undefined) {
   } catch {
     return null;
   }
+}
+
+const hobbyColors: Record<string, { color: string; background: string }> = {
+  "Programação": { color: "#60a5fa", background: "#172554" },
+  Homelab: { color: "#c084fc", background: "#3b0764" },
+  "Impressão 3D": { color: "#fb923c", background: "#431407" },
+  Ciclismo: { color: "#4ade80", background: "#052e16" },
+  Leitura: { color: "#facc15", background: "#422006" },
+};
+
+const defaultHobbyColor = { color: "#d4d4d8", background: "#27272a" };
+
+function addDays(date: Date, amount: number) {
+  const result = new Date(date);
+  result.setUTCDate(result.getUTCDate() + amount);
+  return result;
+}
+
+function dateKey(date: Date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function getCurrentStreak(checkins: CheckinWithProfile[]) {
+  const activeDays = new Set(checkins.map((checkin) => dateKey(new Date(checkin.created_at))));
+  const today = new Date();
+  let streak = 0;
+  const startOffset = activeDays.has(dateKey(today)) ? 0 : -1;
+
+  for (let offset = startOffset; activeDays.has(dateKey(addDays(today, offset))); offset -= 1) {
+    streak += 1;
+  }
+
+  return streak;
 }
 
 export default async function ProfilePage() {
@@ -47,6 +80,18 @@ export default async function ProfilePage() {
     0,
   );
   const totalHours = totalMinutes / 60;
+  const topicTotals = new Map<string, { minutes: number; checkins: number }>();
+  for (const checkin of checkins) {
+    const tag = checkin.hobby_tag ?? "Outros";
+    const current = topicTotals.get(tag) ?? { minutes: 0, checkins: 0 };
+    current.minutes += checkin.time_invested_minutes;
+    current.checkins += 1;
+    topicTotals.set(tag, current);
+  }
+  const topics = [...topicTotals.entries()].sort(([, left], [, right]) => right.minutes - left.minutes);
+  const dominantTopic = topics[0]?.[0] ?? null;
+  const dominantColor = hobbyColors[dominantTopic ?? ""] ?? defaultHobbyColor;
+  const currentStreak = getCurrentStreak(checkins);
   const spotifyEmbedUrl = getSpotifyEmbedUrl(profile?.spotify_url);
   const backgroundUrl = getSafeBackgroundUrl(profile?.bg_gif_url);
 
@@ -63,6 +108,40 @@ export default async function ProfilePage() {
         </div>
       </header>
 
+      <section aria-label="Tópicos ativos e sequência" className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
+        <div className="flex-1 rounded-2xl border border-[#e4e5e9] bg-[#111114] p-5 text-white">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-gray-500">TÓPICOS ATIVOS</p>
+              <p className="mt-2 text-sm text-gray-300">Seus hobbies mais praticados</p>
+            </div>
+            <span className="text-xs text-gray-500">{topics.length} tópicos</span>
+          </div>
+          {topics.length ? (
+            <div className="mt-5 flex flex-wrap gap-2">
+              {topics.map(([topic, totals]) => {
+                const topicColor = hobbyColors[topic] ?? defaultHobbyColor;
+                return (
+                  <span key={topic} className="inline-flex items-center gap-2 rounded-full border bg-zinc-900/80 px-3 py-1.5 text-xs" style={{ borderColor: `${topicColor.color}99`, color: topicColor.color }}>
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: topicColor.color }} />
+                    {topic}
+                    <span className="opacity-60">{totals.checkins}</span>
+                  </span>
+                );
+              })}
+            </div>
+          ) : <p className="mt-5 text-sm text-gray-500">Registre um check-in para ativar seus tópicos.</p>}
+        </div>
+        <div className="flex min-w-64 items-center gap-4 rounded-2xl border p-5" style={{ borderColor: `${dominantColor.color}99`, backgroundColor: dominantColor.background, color: dominantColor.color }}>
+          <Flame className="h-8 w-8 shrink-0" fill="currentColor" strokeWidth={1.5} />
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] opacity-70">SEQUÊNCIA ATUAL</p>
+            <p className="mt-1 text-2xl font-semibold">{currentStreak} dias</p>
+            <p className="mt-1 text-xs opacity-70">{dominantTopic ? `Foco: ${dominantTopic}` : "Comece seu ritmo"}</p>
+          </div>
+        </div>
+      </section>
+
       <section aria-label="Resumo do perfil" className="grid grid-cols-1 gap-4 md:grid-cols-6">
         <article
           className="relative overflow-hidden border border-gray-800 bg-gray-950 p-6 md:col-span-3"
@@ -76,7 +155,7 @@ export default async function ProfilePage() {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={backgroundUrl} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
           ) : null}
-          {backgroundUrl ? <div className="absolute inset-0 bg-black/70" aria-hidden="true" /> : null}
+          {backgroundUrl ? <div className="absolute inset-0 bg-black/35" aria-hidden="true" /> : null}
           <div className="relative">
             <div className="flex items-start justify-between gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-full border border-gray-700 bg-gray-900">
@@ -89,7 +168,7 @@ export default async function ProfilePage() {
               </div>
               <span className="text-xs text-gray-300">IDENTIDADE</span>
             </div>
-            <h2 className="mt-8 text-2xl font-medium">{name}</h2>
+            <h2 className="mt-8 text-2xl font-medium text-white">{name}</h2>
             {profile?.email_public && profile.email ? (
               <p className="mt-2 flex items-center gap-2 text-sm text-gray-300">
                 <Mail className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -101,7 +180,7 @@ export default async function ProfilePage() {
 
         <article className="rounded-2xl border border-[#e4e5e9] bg-[#111114] p-6 text-white md:col-span-3">
           <div className="flex items-start justify-between">
-            <span className="text-xs text-gray-500">GAMIFICAÇÃO</span>
+            <span className="text-xs text-gray-500">RANKING</span>
             <Crown className="h-5 w-5 text-gray-300" strokeWidth={1.5} />
           </div>
           <div className="mt-8 flex items-end justify-between gap-4">
