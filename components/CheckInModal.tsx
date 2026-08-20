@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CHECKIN_BUCKET, HOBBY_TAGS, TIME_OPTIONS, xpForMinutes } from "@/lib/constants";
 import { createSupabaseClient } from "@/lib/supabase";
+import { hasProfanity } from "@/lib/profanityFilter";
 
 type CheckInModalProps = {
   userId: string;
@@ -25,6 +26,7 @@ export function CheckInModal({ userId, currentXp, onClose, onSaved }: CheckInMod
     setLoading(true);
 
     try {
+      if (hasProfanity(description)) throw new Error("Por favor, mantenha um tom respeitoso na comunidade.");
       const supabase = createSupabaseClient();
       let imageUrl: string | null = null;
 

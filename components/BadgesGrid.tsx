@@ -1,8 +1,8 @@
-import { Footprints, Flame, LockKeyhole, Timer, Trophy } from "lucide-react";
+import { Crown, Footprints, Flame, LockKeyhole, Timer, Trophy } from "lucide-react";
 import type { BadgeRow, UserBadgeRow } from "@/lib/database.types";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
-const icons = { footprints: Footprints, flame: Flame, timer: Timer, trophy: Trophy } as const;
+const icons = { footprints: Footprints, flame: Flame, timer: Timer, trophy: Trophy, crown: Crown } as const;
 
 function formatUnlockedAt(value: string) {
   return new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium" }).format(new Date(value));

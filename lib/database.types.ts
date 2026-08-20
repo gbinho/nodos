@@ -2,6 +2,8 @@ export type ProfileRow = {
   id: string;
   email: string | null;
   email_public: boolean;
+  is_admin: boolean;
+  is_suspended: boolean;
   username: string | null;
   avatar_url: string | null;
   spotify_url: string | null;
@@ -51,6 +53,16 @@ export type CheckinVoteRow = {
   vote_type: "up" | "down";
 };
 
+export type ReportRow = {
+  id: string;
+  reporter_id: string;
+  checkin_id: string | null;
+  comment_id: string | null;
+  reason: "spam" | "ofensivo" | "inapropriado" | "outro";
+  status: "pending" | "resolved" | "dismissed";
+  created_at: string;
+};
+
 export type BadgeRow = {
   id: string;
   slug: string;
@@ -84,6 +96,8 @@ export type Database = {
           id: string;
           email?: string | null;
           email_public?: boolean;
+          is_admin?: boolean;
+          is_suspended?: boolean;
           username?: string | null;
           avatar_url?: string | null;
           spotify_url?: string | null;
@@ -93,6 +107,8 @@ export type Database = {
         Update: {
           email?: string | null;
           email_public?: boolean;
+          is_admin?: boolean;
+          is_suspended?: boolean;
           username?: string | null;
           avatar_url?: string | null;
           spotify_url?: string | null;
@@ -239,6 +255,27 @@ export type Database = {
           checkin_id?: string;
           user_id?: string;
           vote_type?: CheckinVoteRow["vote_type"];
+        };
+        Relationships: [];
+      };
+      reports: {
+        Row: ReportRow;
+        Insert: {
+          id?: string;
+          reporter_id: string;
+          checkin_id?: string | null;
+          comment_id?: string | null;
+          reason: ReportRow["reason"];
+          status?: ReportRow["status"];
+          created_at?: string;
+        };
+        Update: {
+          reporter_id?: string;
+          checkin_id?: string | null;
+          comment_id?: string | null;
+          reason?: ReportRow["reason"];
+          status?: ReportRow["status"];
+          created_at?: string;
         };
         Relationships: [];
       };

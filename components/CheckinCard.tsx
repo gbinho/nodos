@@ -3,12 +3,14 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowBigDown, ArrowBigUp, Clock3, Heart, LoaderCircle, MessageCircle, Pencil, Pin, Share2, Trash2, Zap } from "lucide-react";
+import { ArrowBigDown, ArrowBigUp, Clock3, Flag, Heart, LoaderCircle, MessageCircle, MoreHorizontal, Pencil, Pin, Share2, Trash2, Zap } from "lucide-react";
 import { displayName, formatMinutes, formatWhen, type CheckinWithProfile } from "@/lib/checkins";
 import type { CheckinVoteRow, CommentReactionRow, CommentRow, ProfileRow, ReactionRow } from "@/lib/database.types";
 import { createSupabaseClient } from "@/lib/supabase";
 import { ShareCardModal } from "@/components/ShareCardModal";
 import { xpForMinutes } from "@/lib/constants";
+import { hasProfanity } from "@/lib/profanityFilter";
+import { isAdmin } from "@/lib/admin";
 
 type ReactionType = ReactionRow["reaction_type"];
 type ReactionCount = Record<ReactionType, number>;
@@ -71,6 +73,11 @@ export function CheckinCard({ checkin, currentUserId, gallery = false, showPin =
   const [editingText, setEditingText] = useState("");
   const [voteCounts, setVoteCounts] = useState({ up: 0, down: 0 });
   const [myVote, setMyVote] = useState<VoteType | null>(null);
+  const [currentUserAdmin, setCurrentUserAdmin] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState<"spam" | "ofensivo" | "inapropriado" | "outro">("spam");
+  const [reportSent, setReportSent] = useState(false);
 
   const loadEngagement = useCallback(async () => {
     const supabase = createSupabaseClient();
@@ -102,6 +109,8 @@ export function CheckinCard({ checkin, currentUserId, gallery = false, showPin =
       : { data: [], error: null };
     if (profilesError) throw profilesError;
     const profileById = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
+    const { data: currentProfile } = await supabase.from("profiles").select("username, is_admin").eq("id", currentUserId).maybeSingle();
+    setCurrentUserAdmin(isAdmin(currentProfile));
     const nextCommentLikes: Record<string, number> = {};
     const nextLikedComments = new Set<string>();
     for (const like of (commentReactionData ?? []) as (CommentReactionRow & { comment_id: string })[]) {
@@ -156,6 +165,10 @@ export function CheckinCard({ checkin, currentUserId, gallery = false, showPin =
     event.preventDefault();
     const content = commentText.trim();
     if (!content || commentLoading) return;
+    if (hasProfanity(content)) {
+      setError("Por favor, mantenha um tom respeitoso na comunidade.");
+      return;
+    }
     setError(null);
     setCommentLoading(true);
     try {
@@ -225,6 +238,10 @@ export function CheckinCard({ checkin, currentUserId, gallery = false, showPin =
   async function saveCommentEdit(commentId: string) {
     const content = editingText.trim();
     if (!content) return;
+    if (hasProfanity(content)) {
+      setError("Por favor, mantenha um tom respeitoso na comunidade.");
+      return;
+    }
     setError(null);
     try {
       const supabase = createSupabaseClient();
@@ -269,6 +286,31 @@ export function CheckinCard({ checkin, currentUserId, gallery = false, showPin =
     }
   }
 
+  async function submitReport() {
+    try {
+      const supabase = createSupabaseClient();
+      const { error: reportError } = await supabase.from("reports").insert({ reporter_id: currentUserId, checkin_id: checkin.id, reason: reportReason });
+      if (reportError) throw reportError;
+      setReportSent(true);
+    } catch (reportError) {
+      setError(reportError instanceof Error ? reportError.message : "Não foi possível enviar a denúncia.");
+    }
+  }
+
+  async function deletePost() {
+    if (!currentUserAdmin || !window.confirm("Excluir esta postagem?")) return;
+    const supabase = createSupabaseClient();
+    const { error: deleteError } = await supabase.from("checkins").delete().eq("id", checkin.id);
+    if (deleteError) setError(deleteError.message); else router.refresh();
+  }
+
+  async function suspendAuthor() {
+    if (!currentUserAdmin || !checkin.user_id) return;
+    const supabase = createSupabaseClient();
+    const { error: suspendError } = await supabase.from("profiles").update({ is_suspended: true }).eq("id", checkin.user_id);
+    if (suspendError) setError(suspendError.message); else setMenuOpen(false);
+  }
+
   return (
     <article className={`feed-card overflow-hidden rounded-2xl border bg-white shadow-[0_8px_30px_rgba(22,22,28,0.06)] ${featured ? "border-[#111114]" : "border-[#e4e5e9]"}`}>
       <div className="px-5 pt-5">
@@ -288,7 +330,7 @@ export function CheckinCard({ checkin, currentUserId, gallery = false, showPin =
               {checkin.description ? <p className="mt-1 line-clamp-2 text-sm font-medium text-[#555760]">{checkin.description}</p> : null}
             </div>
           </div>
-          <span className="flex shrink-0 items-center gap-2 text-xs text-[#555760]"><span className="inline-flex items-center gap-1"><Clock3 className="h-3.5 w-3.5" strokeWidth={1.7} />{formatMinutes(checkin.time_invested_minutes)}</span><span className="inline-flex items-center gap-0.5 font-medium text-[#111114]"><Zap className="h-3.5 w-3.5" fill="currentColor" strokeWidth={1.7} />+{xpForMinutes(checkin.time_invested_minutes)} XP</span></span>
+          <div className="relative flex items-center gap-2"><span className="flex items-center gap-2 text-xs text-[#555760]"><span className="inline-flex items-center gap-1"><Clock3 className="h-3.5 w-3.5" strokeWidth={1.7} />{formatMinutes(checkin.time_invested_minutes)}</span><span className="inline-flex items-center gap-0.5 font-medium text-[#111114]"><Zap className="h-3.5 w-3.5" fill="currentColor" strokeWidth={1.7} />+{xpForMinutes(checkin.time_invested_minutes)} XP</span></span><button type="button" aria-label="Opções da postagem" onClick={() => setMenuOpen((open) => !open)} className="rounded-lg p-1 text-[#71737c] hover:bg-gray-100 hover:text-[#111114]"><MoreHorizontal className="h-5 w-5" /></button>{menuOpen ? <div className="absolute right-0 top-8 z-20 w-48 rounded-xl border border-gray-200 bg-white p-1 text-left shadow-xl"><button type="button" onClick={() => { setReportOpen(true); setMenuOpen(false); }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-gray-700 hover:bg-gray-100"><Flag className="h-3.5 w-3.5" />Denunciar</button>{currentUserAdmin ? <><button type="button" onClick={() => void deletePost()} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-red-600 hover:bg-red-50"><Trash2 className="h-3.5 w-3.5" />Deletar postagem</button><button type="button" onClick={() => void suspendAuthor()} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-amber-700 hover:bg-amber-50">Suspender usuário</button></> : null}</div> : null}</div>
         </div>
       </div>
       {checkin.image_url ? (
@@ -315,6 +357,7 @@ export function CheckinCard({ checkin, currentUserId, gallery = false, showPin =
         {error ? <p role="alert" className="mt-3 text-xs text-gray-500">{error}</p> : null}
       </div>
       {shareOpen ? <ShareCardModal checkin={checkin} onClose={() => setShareOpen(false)} /> : null}
+      {reportOpen ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"><div className="w-full max-w-sm rounded-2xl bg-white p-6 text-[#111114]"><h2 className="text-lg font-semibold">Denunciar postagem</h2>{reportSent ? <p className="mt-4 text-sm text-gray-600">Denúncia enviada. Obrigado por ajudar a comunidade.</p> : <><select value={reportReason} onChange={(event) => setReportReason(event.target.value as typeof reportReason)} className="mt-4 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"><option value="spam">Spam</option><option value="ofensivo">Ofensivo</option><option value="inapropriado">Inapropriado</option><option value="outro">Outro</option></select><div className="mt-5 flex justify-end gap-2"><button type="button" onClick={() => setReportOpen(false)} className="px-3 py-2 text-sm text-gray-500">Cancelar</button><button type="button" onClick={() => void submitReport()} className="rounded-lg bg-[#111114] px-3 py-2 text-sm text-white">Enviar denúncia</button></div></>}</div></div> : null}
     </article>
   );
 }

@@ -7,6 +7,7 @@ import type { ProfileRow } from "@/lib/database.types";
 import { createSupabaseClient } from "@/lib/supabase";
 import { displayName } from "@/lib/checkins";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { isAdmin } from "@/lib/admin";
 
 type SidebarProps = {
   profile: ProfileRow | null;
@@ -70,6 +71,7 @@ export function Sidebar({ profile }: SidebarProps) {
           <Settings className="h-4 w-4" strokeWidth={1.7} />
           Configurações
         </Link>
+        {isAdmin(profile) ? <Link href="/admin" className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${pathname === "/admin" ? "bg-[#202229] text-white" : "text-gray-400 hover:bg-[#1a1b20] hover:text-white"}`}>Moderation</Link> : null}
       </nav>
 
       <div className="mt-auto border-t border-white/10 pt-5" />

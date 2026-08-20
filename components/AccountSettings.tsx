@@ -5,6 +5,7 @@ import { AlertTriangle, Download, Save, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { ProfileRow } from "@/lib/database.types";
 import { createSupabaseClient } from "@/lib/supabase";
+import { hasProfanity } from "@/lib/profanityFilter";
 
 type AccountSettingsProps = {
   profile: ProfileRow;
@@ -53,6 +54,10 @@ export function AccountSettings({ profile, authEmail }: AccountSettingsProps) {
     const cleanAvatarUrl = avatarUrl.trim();
     if (!cleanUsername) {
       setError("Informe um username.");
+      return;
+    }
+    if (hasProfanity(cleanUsername)) {
+      setError("Este nome de usuário contém termos não permitidos.");
       return;
     }
     if (!validUrl(cleanAvatarUrl)) {
