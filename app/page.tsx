@@ -37,7 +37,7 @@ export default async function HomePage() {
       ) : (
         <div className="flex flex-col gap-4">
           {checkins.map((checkin) => (
-            <CheckinCard key={checkin.id} checkin={checkin} />
+            <CheckinCard key={checkin.id} checkin={checkin} currentUserId={user.id} />
           ))}
         </div>
       )}

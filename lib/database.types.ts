@@ -18,6 +18,21 @@ export type CheckinRow = {
   created_at: string;
 };
 
+export type ReactionRow = {
+  id: string;
+  checkin_id: string;
+  user_id: string;
+  reaction_type: "inspired" | "respect" | "fire";
+};
+
+export type CommentRow = {
+  id: string;
+  checkin_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -70,6 +85,38 @@ export type Database = {
             referencedColumns: ["id"];
           },
         ];
+      };
+      reactions: {
+        Row: ReactionRow;
+        Insert: {
+          id?: string;
+          checkin_id: string;
+          user_id: string;
+          reaction_type: ReactionRow["reaction_type"];
+        };
+        Update: {
+          checkin_id?: string;
+          user_id?: string;
+          reaction_type?: ReactionRow["reaction_type"];
+        };
+        Relationships: [];
+      };
+      comments: {
+        Row: CommentRow;
+        Insert: {
+          id?: string;
+          checkin_id: string;
+          user_id: string;
+          content: string;
+          created_at?: string;
+        };
+        Update: {
+          checkin_id?: string;
+          user_id?: string;
+          content?: string;
+          created_at?: string;
+        };
+        Relationships: [];
       };
     };
     Views: Record<string, never>;

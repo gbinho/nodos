@@ -19,6 +19,7 @@ export default async function NodesPage() {
 
   return (
     <NodesExplorer
+      currentUserId={user.id}
       initialCheckins={(data ?? []) as CheckinWithProfile[]}
       initialError={error?.message ?? null}
       tags={HOBBY_TAGS}

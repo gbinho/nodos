@@ -7,12 +7,13 @@ import { formatMinutes, type CheckinWithProfile } from "@/lib/checkins";
 import { createSupabaseClient } from "@/lib/supabase";
 
 type NodesExplorerProps = {
+  currentUserId: string;
   initialCheckins: CheckinWithProfile[];
   initialError: string | null;
   tags: readonly string[];
 };
 
-export function NodesExplorer({ initialCheckins, initialError, tags }: NodesExplorerProps) {
+export function NodesExplorer({ currentUserId, initialCheckins, initialError, tags }: NodesExplorerProps) {
   const [selectedTag, setSelectedTag] = useState("Todos");
   const [checkins, setCheckins] = useState(initialCheckins);
   const [error, setError] = useState(initialError);
@@ -133,7 +134,7 @@ export function NodesExplorer({ initialCheckins, initialError, tags }: NodesExpl
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            {checkins.map((checkin) => <CheckinCard key={checkin.id} checkin={checkin} />)}
+            {checkins.map((checkin) => <CheckinCard key={checkin.id} checkin={checkin} currentUserId={currentUserId} />)}
           </div>
         )}
       </section>
