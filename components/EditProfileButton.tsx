@@ -5,6 +5,7 @@ import { Settings, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { ProfileRow } from "@/lib/database.types";
 import { createSupabaseClient } from "@/lib/supabase";
+import { isSpotifyUrl } from "@/lib/spotify";
 
 type EditProfileButtonProps = {
   profile: ProfileRow;
@@ -28,6 +29,7 @@ function getSaveErrorMessage(error: unknown) {
     if (code === "42501") {
       return "O Supabase bloqueou a alteração. Verifique a policy profiles_update_own para o usuário logado.";
     }
+    if (code === "23505") return "Este username já está em uso. Escolha outro.";
   }
 
   if (error instanceof Error && error.message) return error.message;
@@ -39,6 +41,8 @@ export function EditProfileButton({ profile }: EditProfileButtonProps) {
   const [open, setOpen] = useState(false);
   const [spotifyUrl, setSpotifyUrl] = useState(profile.spotify_url ?? "");
   const [bgGifUrl, setBgGifUrl] = useState(profile.bg_gif_url ?? "");
+  const [username, setUsername] = useState(profile.username ?? "");
+  const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? "");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -54,12 +58,22 @@ export function EditProfileButton({ profile }: EditProfileButtonProps) {
 
     const cleanSpotifyUrl = spotifyUrl.trim();
     const cleanBgGifUrl = bgGifUrl.trim();
-    if (cleanSpotifyUrl && !isHttpUrl(cleanSpotifyUrl)) {
-      setError("Informe uma URL válida do Spotify.");
+    const cleanUsername = username.trim().replace(/^@+/, "").toLowerCase();
+    const cleanAvatarUrl = avatarUrl.trim();
+    if (!cleanUsername) {
+      setError("Informe um username.");
+      return;
+    }
+    if (!isSpotifyUrl(cleanSpotifyUrl)) {
+      setError("Cole um link de música, playlist, álbum, episódio ou show do Spotify.");
       return;
     }
     if (cleanBgGifUrl && !isHttpUrl(cleanBgGifUrl)) {
       setError("Informe uma URL válida para o GIF.");
+      return;
+    }
+    if (cleanAvatarUrl && !isHttpUrl(cleanAvatarUrl)) {
+      setError("Informe uma URL válida para a foto de perfil.");
       return;
     }
 
@@ -69,6 +83,8 @@ export function EditProfileButton({ profile }: EditProfileButtonProps) {
       const { error: updateError } = await supabase
         .from("profiles")
         .update({
+          username: cleanUsername,
+          avatar_url: cleanAvatarUrl || null,
           spotify_url: cleanSpotifyUrl || null,
           bg_gif_url: cleanBgGifUrl || null,
         })
@@ -105,6 +121,15 @@ export function EditProfileButton({ profile }: EditProfileButtonProps) {
               </button>
             </div>
             <form onSubmit={save} className="flex flex-col gap-5">
+              <label className="flex flex-col gap-2 text-sm">
+                <span className="text-gray-400">Nome de usuário</span>
+                <input value={username} onChange={(event) => setUsername(event.target.value)} maxLength={40} placeholder="seu_nome" className="border border-gray-800 bg-black px-3 py-2 text-white outline-none placeholder:text-gray-600 focus:border-gray-400" />
+                <span className="text-xs text-gray-600">Será exibido como @{username.replace(/^@+/, "") || "seu_nome"}.</span>
+              </label>
+              <label className="flex flex-col gap-2 text-sm">
+                <span className="text-gray-400">Foto de perfil (URL)</span>
+                <input type="url" value={avatarUrl} onChange={(event) => setAvatarUrl(event.target.value)} placeholder="https://.../avatar.jpg" className="border border-gray-800 bg-black px-3 py-2 text-white outline-none placeholder:text-gray-600 focus:border-gray-400" />
+              </label>
               <label className="flex flex-col gap-2 text-sm">
                 <span className="text-gray-400">URL do Spotify</span>
                 <input

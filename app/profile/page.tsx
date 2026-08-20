@@ -7,25 +7,9 @@ import SetupEnvPage from "@/components/SetupEnvPage";
 import { getSessionUser } from "@/lib/auth";
 import { checkAndAwardBadges } from "@/lib/badges";
 import { displayName, formatMinutes, type CheckinWithProfile } from "@/lib/checkins";
+import { getSpotifyEmbedUrl } from "@/lib/spotify";
 
 export const dynamic = "force-dynamic";
-
-function getSpotifyEmbedUrl(value: string | null | undefined) {
-  if (!value) return null;
-
-  try {
-    const url = new URL(value);
-    if (url.hostname !== "open.spotify.com") return null;
-
-    const [type, id] = url.pathname.split("/").filter(Boolean);
-    const supportedTypes = new Set(["track", "playlist", "album", "episode", "show"]);
-    if (!id || !supportedTypes.has(type)) return null;
-
-    return `https://open.spotify.com/embed/${type}/${encodeURIComponent(id)}`;
-  } catch {
-    return null;
-  }
-}
 
 function getSafeBackgroundUrl(value: string | null | undefined) {
   if (!value) return null;
@@ -102,10 +86,12 @@ export default async function ProfilePage() {
               <span className="text-xs text-gray-300">IDENTIDADE</span>
             </div>
             <h2 className="mt-8 text-2xl font-medium">{name}</h2>
-            <p className="mt-2 flex items-center gap-2 text-sm text-gray-300">
-              <Mail className="h-3.5 w-3.5" strokeWidth={1.5} />
-              {profile?.email_public ? profile.email ?? "E-mail não informado" : "E-mail oculto"}
-            </p>
+            {profile?.email_public && profile.email ? (
+              <p className="mt-2 flex items-center gap-2 text-sm text-gray-300">
+                <Mail className="h-3.5 w-3.5" strokeWidth={1.5} />
+                {profile.email}
+              </p>
+            ) : null}
           </div>
         </article>
 
