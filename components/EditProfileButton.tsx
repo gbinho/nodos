@@ -20,6 +20,16 @@ function isHttpUrl(value: string) {
   }
 }
 
+function isDirectGifUrl(value: string) {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    return (url.protocol === "https:" || url.protocol === "http:") && url.pathname.toLowerCase().endsWith(".gif");
+  } catch {
+    return false;
+  }
+}
+
 function getSaveErrorMessage(error: unknown) {
   if (typeof error === "object" && error !== null && "code" in error) {
     const code = String(error.code);
@@ -68,8 +78,8 @@ export function EditProfileButton({ profile }: EditProfileButtonProps) {
       setError("Cole um link de música, playlist, álbum, episódio ou show do Spotify.");
       return;
     }
-    if (cleanBgGifUrl && !isHttpUrl(cleanBgGifUrl)) {
-      setError("Informe uma URL válida para o GIF.");
+    if (!isDirectGifUrl(cleanBgGifUrl)) {
+      setError("Use o link direto do arquivo GIF, terminando em .gif. Links de páginas do Giphy/Tenor não funcionam como imagem.");
       return;
     }
     if (cleanAvatarUrl && !isHttpUrl(cleanAvatarUrl)) {
@@ -147,9 +157,10 @@ export function EditProfileButton({ profile }: EditProfileButtonProps) {
                   type="url"
                   value={bgGifUrl}
                   onChange={(event) => setBgGifUrl(event.target.value)}
-                  placeholder="https://media.giphy.com/...gif"
+                  placeholder="https://media.giphy.com/.../arquivo.gif"
                   className="border border-gray-800 bg-black px-3 py-2 text-white outline-none placeholder:text-gray-600 focus:border-gray-400"
                 />
+                <span className="text-xs text-gray-600">Use uma URL direta terminada em .gif, não o link da página do Giphy/Tenor.</span>
               </label>
               {error ? <p className="text-sm text-gray-400">{error}</p> : null}
               <button type="submit" disabled={saving} className="border border-white px-3 py-2 text-sm hover:bg-white hover:text-black disabled:border-gray-800 disabled:text-gray-500">

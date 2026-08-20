@@ -72,6 +72,10 @@ export default async function ProfilePage() {
               : undefined
           }
         >
+          {backgroundUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={backgroundUrl} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
+          ) : null}
           {backgroundUrl ? <div className="absolute inset-0 bg-black/70" aria-hidden="true" /> : null}
           <div className="relative">
             <div className="flex items-start justify-between gap-4">
