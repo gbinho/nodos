@@ -46,3 +46,33 @@ select {
 .feed-card {
   animation: feed-card-in 360ms ease-out both;
 }
+
+html[data-theme="dark"] body {
+  background: #0c0d0f;
+  color: #f4f4f5;
+}
+
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] [class*="bg-[#f7f8fa]"] {
+  background-color: #17181c !important;
+}
+
+html[data-theme="dark"] [class*="text-[#111114]"] {
+  color: #f4f4f5 !important;
+}
+
+html[data-theme="dark"] [class*="text-[#555760]"],
+html[data-theme="dark"] [class*="text-[#71737c]"] {
+  color: #a1a1aa !important;
+}
+
+html[data-theme="dark"] [class*="border-[#e4e5e9]"],
+html[data-theme="dark"] [class*="border-[#ececf0]"],
+html[data-theme="dark"] [class*="border-[#d7d8dd]"] {
+  border-color: #3f4148 !important;
+}
+
+html[data-theme="dark"] .feed-card {
+  background: #17181c !important;
+  border-color: #3f4148 !important;
+}

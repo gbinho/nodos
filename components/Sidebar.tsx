@@ -6,6 +6,7 @@ import { Compass, House, LogOut, Search, Settings, Sparkles, User } from "lucide
 import type { ProfileRow } from "@/lib/database.types";
 import { createSupabaseClient } from "@/lib/supabase";
 import { displayName } from "@/lib/checkins";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 type SidebarProps = {
   profile: ProfileRow | null;
@@ -25,8 +26,17 @@ export function Sidebar({ profile }: SidebarProps) {
 
   return (
     <aside className="fixed inset-y-5 left-5 z-40 hidden w-56 flex-col rounded-[28px] bg-[#101114] px-4 py-6 text-white md:flex lg:inset-y-7 lg:left-7 lg:min-h-[calc(100vh-3.5rem)] lg:rounded-l-[28px] lg:rounded-r-none">
-      <Link href="/" className="px-3 text-lg font-semibold tracking-[-0.06em] text-white">
-        nodos<span className="text-white">.</span>
+      <div className="flex items-center justify-between gap-2 px-3">
+        <Link href="/" className="text-lg font-semibold tracking-[-0.06em] text-white">nodos<span className="text-white">.</span></Link>
+        <ThemeToggle />
+      </div>
+
+      <Link href="/profile" className={`mt-6 flex items-center gap-3 rounded-xl px-3 py-3 transition ${pathname === "/profile" ? "bg-[#202229]" : "hover:bg-[#1a1b20]"}`}>
+        {profile?.avatar_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={profile.avatar_url} alt="" className="h-12 w-12 rounded-full border border-white/20 object-cover" />
+        ) : <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-[#202229]"><User className="h-5 w-5 text-gray-400" strokeWidth={1.25} /></div>}
+        <div className="min-w-0"><p className="truncate text-sm text-white">@{name}</p><p className="text-[11px] text-gray-500">Meu perfil · {profile?.total_xp ?? 0} XP</p></div>
       </Link>
 
       <Link href="/" className="mt-9 flex items-center justify-center gap-2 rounded-xl bg-white px-3 py-3 text-xs font-medium text-[#111114] transition hover:bg-gray-200">
@@ -62,26 +72,7 @@ export function Sidebar({ profile }: SidebarProps) {
         </Link>
       </nav>
 
-      <div className="mt-auto border-t border-white/10 pt-5">
-        <div className="mb-4 flex items-center gap-3 px-2">
-        {profile?.avatar_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={profile.avatar_url}
-            alt=""
-            className="h-9 w-9 rounded-full border border-white/10 object-cover"
-          />
-        ) : (
-          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-[#202229]">
-            <User className="h-4 w-4 text-gray-400" strokeWidth={1.25} />
-          </div>
-        )}
-        <div className="min-w-0">
-          <p className="truncate text-sm text-white">@{name}</p>
-          <p className="text-[11px] text-gray-500">{profile?.total_xp ?? 0} XP</p>
-        </div>
-      </div>
-      </div>
+      <div className="mt-auto border-t border-white/10 pt-5" />
       <button
         type="button"
         onClick={logout}

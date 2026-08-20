@@ -3,11 +3,12 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowBigDown, ArrowBigUp, Heart, LoaderCircle, MessageCircle, Pencil, Pin, Share2, Trash2 } from "lucide-react";
+import { ArrowBigDown, ArrowBigUp, Clock3, Heart, LoaderCircle, MessageCircle, Pencil, Pin, Share2, Trash2, Zap } from "lucide-react";
 import { displayName, formatMinutes, formatWhen, type CheckinWithProfile } from "@/lib/checkins";
 import type { CheckinVoteRow, CommentReactionRow, CommentRow, ProfileRow, ReactionRow } from "@/lib/database.types";
 import { createSupabaseClient } from "@/lib/supabase";
 import { ShareCardModal } from "@/components/ShareCardModal";
+import { xpForMinutes } from "@/lib/constants";
 
 type ReactionType = ReactionRow["reaction_type"];
 type ReactionCount = Record<ReactionType, number>;
@@ -272,13 +273,22 @@ export function CheckinCard({ checkin, currentUserId, gallery = false, showPin =
     <article className={`feed-card overflow-hidden rounded-2xl border bg-white shadow-[0_8px_30px_rgba(22,22,28,0.06)] ${featured ? "border-[#111114]" : "border-[#e4e5e9]"}`}>
       <div className="px-5 pt-5">
         <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <Link href={`/nodes?tag=${encodeURIComponent(checkin.hobby_tag ?? "")}`} className="text-base font-semibold text-[#111114] hover:underline">
-              #{checkin.hobby_tag ?? "Hobby"}
+          <div className="flex min-w-0 items-start gap-3">
+            <Link href={checkin.user_id ? `/users/${checkin.user_id}` : "#"} className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#d7d8dd] bg-[#f1f1f3]" aria-label={`Perfil de @${name}`}>
+              {checkin.profiles?.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={checkin.profiles.avatar_url} alt="" className="h-full w-full object-cover" />
+              ) : <span className="text-xs font-semibold text-[#71737c]">{name.slice(0, 1).toUpperCase()}</span>}
             </Link>
-            {checkin.description ? <p className="mt-1 line-clamp-2 text-sm font-medium text-[#555760]">{checkin.description}</p> : null}
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <Link href={checkin.user_id ? `/users/${checkin.user_id}` : "#"} className="text-sm font-semibold text-[#111114] hover:underline">@{name}</Link>
+                <Link href={`/nodes?tag=${encodeURIComponent(checkin.hobby_tag ?? "")}`} className="text-xs font-medium text-[#555760] hover:text-[#111114] hover:underline">#{checkin.hobby_tag ?? "Hobby"}</Link>
+              </div>
+              {checkin.description ? <p className="mt-1 line-clamp-2 text-sm font-medium text-[#555760]">{checkin.description}</p> : null}
+            </div>
           </div>
-          <span className="shrink-0 text-xs text-[#8b8d96]">{formatMinutes(checkin.time_invested_minutes)}</span>
+          <span className="flex shrink-0 items-center gap-2 text-xs text-[#555760]"><span className="inline-flex items-center gap-1"><Clock3 className="h-3.5 w-3.5" strokeWidth={1.7} />{formatMinutes(checkin.time_invested_minutes)}</span><span className="inline-flex items-center gap-0.5 font-medium text-[#111114]"><Zap className="h-3.5 w-3.5" fill="currentColor" strokeWidth={1.7} />+{xpForMinutes(checkin.time_invested_minutes)} XP</span></span>
         </div>
       </div>
       {checkin.image_url ? (
@@ -288,7 +298,7 @@ export function CheckinCard({ checkin, currentUserId, gallery = false, showPin =
         </div>
       ) : null}
       <div className={gallery ? "p-4" : "p-5"}>
-        <div className="flex items-baseline justify-between gap-3"><Link href={checkin.user_id ? `/users/${checkin.user_id}` : "#"} className="text-sm font-medium text-[#111114] hover:underline">@{name}</Link><p className="text-xs text-[#8b8d96]">{formatWhen(checkin.created_at)}</p></div>
+        <div className="flex justify-end"><p className="text-xs text-[#8b8d96]">{formatWhen(checkin.created_at)}</p></div>
         {showPin ? <button type="button" onClick={() => void toggleFeatured()} disabled={pinLoading || (!featured && featuredCount >= 3)} className={`mt-3 inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-all active:scale-95 ${featured ? "border-[#111114] bg-[#111114] text-white" : "border-[#d7d8dd] text-[#111114] hover:border-[#111114]"}`}><Pin className="h-3.5 w-3.5" fill={featured ? "currentColor" : "none"} />{pinLoading ? "..." : featured ? "Desfixar" : "Fixar"}</button> : null}
         {gallery ? <div className="mt-3 flex items-center justify-between border-t border-[#ececf0] pt-3 text-xs text-[#71737c]"><span>{checkin.description ? checkin.description.slice(0, 48) : "Progresso registrado"}</span>{featured ? <Pin className="h-3.5 w-3.5 text-[#111114]" fill="currentColor" /> : null}</div> : null}
         <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-[#ececf0] pt-4">
