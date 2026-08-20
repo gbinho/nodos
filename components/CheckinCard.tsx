@@ -1,10 +1,11 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { LoaderCircle, MessageCircle } from "lucide-react";
+import { LoaderCircle, MessageCircle, Send } from "lucide-react";
 import { displayName, formatMinutes, formatWhen, type CheckinWithProfile } from "@/lib/checkins";
 import type { CommentRow, ProfileRow, ReactionRow } from "@/lib/database.types";
 import { createSupabaseClient } from "@/lib/supabase";
+import { ShareCardModal } from "@/components/ShareCardModal";
 
 type ReactionType = ReactionRow["reaction_type"];
 type ReactionCount = Record<ReactionType, number>;
@@ -28,6 +29,7 @@ export function CheckinCard({ checkin, currentUserId }: { checkin: CheckinWithPr
   const [reactionLoading, setReactionLoading] = useState<ReactionType | null>(null);
   const [commentLoading, setCommentLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const loadEngagement = useCallback(async () => {
     const supabase = createSupabaseClient();
@@ -118,6 +120,7 @@ export function CheckinCard({ checkin, currentUserId }: { checkin: CheckinWithPr
         <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-gray-800 pt-4">
           {reactionOptions.map(({ type, label, emoji }) => <button key={type} type="button" onClick={() => void toggleReaction(type)} disabled={loading || reactionLoading !== null} aria-pressed={myReaction === type} className={`border px-2.5 py-1.5 text-xs transition-colors ${myReaction === type ? "border-white bg-white text-black" : "border-gray-800 text-gray-400 hover:border-gray-500 hover:text-white"}`}>{reactionLoading === type ? "..." : `${emoji} ${label} ${counts[type]}`}</button>)}
           <button type="button" onClick={() => setCommentsOpen((open) => !open)} className="ml-auto flex items-center gap-1.5 text-xs text-gray-400 hover:text-white"><MessageCircle className="h-3.5 w-3.5" strokeWidth={1.5} />Comentários ({comments.length})</button>
+          <button type="button" onClick={() => setShareOpen(true)} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white"><Send className="h-3.5 w-3.5" strokeWidth={1.5} />Compartilhar</button>
         </div>
         {commentsOpen ? <div className="mt-4 border-t border-gray-800 pt-4">
           {loading ? <LoaderCircle className="mx-auto h-4 w-4 animate-spin text-gray-500" /> : comments.length === 0 ? <p className="text-sm text-gray-500">Nenhum comentário ainda.</p> : <div className="flex flex-col gap-3">{comments.map((comment) => <div key={comment.id} className="flex gap-2.5"><div className="h-7 w-7 shrink-0 rounded-full border border-gray-800" /><div className="min-w-0"><p className="text-xs text-gray-400">{displayName(comment.profile)}</p><p className="mt-0.5 break-words text-sm text-gray-200">{comment.content}</p></div></div>)}</div>}
@@ -125,6 +128,7 @@ export function CheckinCard({ checkin, currentUserId }: { checkin: CheckinWithPr
         </div> : null}
         {error ? <p className="mt-3 text-xs text-gray-500">Não foi possível atualizar o engajamento.</p> : null}
       </div>
+      {shareOpen ? <ShareCardModal checkin={checkin} onClose={() => setShareOpen(false)} /> : null}
     </article>
   );
 }
