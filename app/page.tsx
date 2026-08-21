@@ -1,7 +1,6 @@
 import { AddCheckInButton } from "@/components/AddCheckInButton";
 import { FeedTabs } from "@/components/FeedTabs";
 import SetupEnvPage from "@/components/SetupEnvPage";
-import { HobbyRequestButton } from "@/components/hobby-request/HobbyRequestButton";
 import { getSessionUser } from "@/lib/auth";
 import type { CheckinWithProfile } from "@/lib/checkins";
 
@@ -44,10 +43,6 @@ export default async function HomePage() {
       </div>
 
       <AddCheckInButton userId={user.id} currentXp={profile?.total_xp ?? 0} />
-
-      <div className="flex justify-center">
-        <HobbyRequestButton />
-      </div>
 
       <FeedTabs
         globalCheckins={globalCheckins}

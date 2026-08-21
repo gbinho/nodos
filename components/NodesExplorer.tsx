@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Activity, Clock3, LoaderCircle, Users } from "lucide-react";
 import { CheckinCard } from "@/components/CheckinCard";
-import { HobbyRequestButton } from "@/components/hobby-request/HobbyRequestButton";
 import { formatMinutes, type CheckinWithProfile } from "@/lib/checkins";
 import { createSupabaseClient } from "@/lib/supabase";
 
@@ -82,10 +81,6 @@ export function NodesExplorer({ currentUserId, initialCheckins, initialError, ta
           </div>
         </div>
       </header>
-
-      <div className="flex justify-end">
-        <HobbyRequestButton />
-      </div>
 
       <nav aria-label="Filtrar Nodes" className="flex flex-wrap gap-2 border-y border-[#e4e5e9] py-4">
         {["Todos", ...tags].map((tag) => (

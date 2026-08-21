@@ -87,25 +87,6 @@ export type FollowRow = {
   created_at: string;
 };
 
-export type HobbyRequestRow = {
-  id: string;
-  user_id: string;
-  hobby_name: string;
-  category: string;
-  description: string | null;
-  status: "pending" | "approved" | "rejected";
-  created_at: string;
-};
-
-export type OfficialHobbyRow = {
-  id: string;
-  name: string;
-  slug: string;
-  category: string;
-  color_hex: string;
-  created_at: string;
-};
-
 export type Database = {
   public: {
     Tables: {
@@ -294,56 +275,6 @@ export type Database = {
           comment_id?: string | null;
           reason?: ReportRow["reason"];
           status?: ReportRow["status"];
-          created_at?: string;
-        };
-        Relationships: [];
-      };
-      hobby_requests: {
-        Row: HobbyRequestRow;
-        Insert: {
-          id?: string;
-          user_id?: string;
-          hobby_name?: string;
-          category?: string;
-          description?: string | null;
-          status?: "pending" | "approved" | "rejected";
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          hobby_name?: string;
-          category?: string;
-          description?: string | null;
-          status?: "pending" | "approved" | "rejected";
-          created_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "hobby_requests_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      official_hobbies: {
-        Row: OfficialHobbyRow;
-        Insert: {
-          id?: string;
-          name?: string;
-          slug?: string;
-          category?: string;
-          color_hex?: string;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          name?: string;
-          slug?: string;
-          category?: string;
-          color_hex?: string;
           created_at?: string;
         };
         Relationships: [];
