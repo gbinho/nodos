@@ -59,6 +59,10 @@ export function Sidebar({ profile }: SidebarProps) {
           <Search className="h-4 w-4" strokeWidth={1.7} />
           Buscar pessoas
         </Link>
+        <Link href="/hobbies" className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${pathname === "/hobbies" ? "bg-[#202229] text-white" : "text-gray-400 hover:bg-[#1a1b20] hover:text-white"}`}>
+          <Sparkles className="h-4 w-4" strokeWidth={1.7} />
+          Todos os Hobbies
+        </Link>
       </nav>
 
       <p className="mb-2 mt-8 px-3 text-[10px] font-medium uppercase tracking-[0.18em] text-gray-500">Você</p>
@@ -71,7 +75,19 @@ export function Sidebar({ profile }: SidebarProps) {
           <Settings className="h-4 w-4" strokeWidth={1.7} />
           Configurações
         </Link>
-        {isAdmin(profile) ? <Link href="/admin" className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${pathname === "/admin" ? "bg-[#202229] text-white" : "text-gray-400 hover:bg-[#1a1b20] hover:text-white"}`}>Moderation</Link> : null}
+        {isAdmin(profile) ? (
+          <>
+            <Link href="/admin" className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${pathname === "/admin" ? "bg-[#202229] text-white" : "text-gray-400 hover:bg-[#1a1b20] hover:text-white"}`}>
+              <span>Denúncias</span>
+            </Link>
+            <Link href="/admin/hobbies" className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${pathname === "/admin/hobbies" ? "bg-[#202229] text-white" : "text-gray-400 hover:bg-[#1a1b20] hover:text-white"}`}>
+              <span>Hobbies</span>
+            </Link>
+            <Link href="/admin/hobbies/official" className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${pathname === "/admin/hobbies/official" ? "bg-[#202229] text-white" : "text-gray-400 hover:bg-[#1a1b20] hover:text-white"}`}>
+              <span>Hobbies Oficiais</span>
+            </Link>
+          </>
+        ) : null}
       </nav>
 
       <div className="mt-auto border-t border-white/10 pt-5" />
