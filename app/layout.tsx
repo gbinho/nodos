@@ -14,6 +14,11 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "NODOS",
   description: "Tracking diário de hobbies, projetos e comunidades.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 };
 
 export default async function RootLayout({
